@@ -6,11 +6,19 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.stream.Stream;
+
+import static java.util.logging.LogManager.*;
 
 public class ReaderClient {
 
   public static void main(String[] args) throws IOException, ParseException {
+
+    System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.client.protocol.ResponseProcessCookies", "fatal");
+    java.util.logging.Logger.getLogger("org.apache.http.client.protocol.ResponseProcessCookies").setLevel(Level.OFF);
+    System.getProperties().put("org.apache.commons.logging.simplelog.defaultlog", "fatal");
 
     String directory = "/media/kiru/Elements/projects/wikidata/";
     String propertiesFile = "/home/kiru/Documents/phd/wikidata/properties-12M.csv";
@@ -34,7 +42,7 @@ public class ReaderClient {
         lines.close();
     }
 
-    reader.saveEntities(entitiesFile);
+    reader.saveEntities();
 
     System.err.println(reader.getRecordCounter());
     // System.err.println(container);

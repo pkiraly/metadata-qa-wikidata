@@ -34,6 +34,7 @@ public class SparqlClientJena {
     String value = entityId;
     try (QueryExecution qexec = QueryExecutionFactory.sparqlService(SPARQL_ENDPOINT, query)) {
       ((QueryEngineHTTP)qexec).addParam("timeout", "10000");
+      // ((QueryEngineHTTP)qexec).setDefaultGraphURIs addParam("timeout", "10000");
       ResultSet rs = qexec.execSelect();
       while (rs.hasNext()) {
         QuerySolution hit = rs.next();
