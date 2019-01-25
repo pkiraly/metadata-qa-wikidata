@@ -1,5 +1,6 @@
-package de.gwdg.metadataqa.wikidata.json;
+package de.gwdg.metadataqa.wikidata.json.labelextractor;
 
+import de.gwdg.metadataqa.wikidata.json.LabelExtractor;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryFactory;
@@ -9,7 +10,11 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 
-public class SparqlClientJena {
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class JenaBasedSparqlClient implements LabelExtractor {
 
   public static final String SPARQL_ENDPOINT = "https://query.wikidata.org/sparql";
   public static final String QUERY_PATTERN = "PREFIX wd: <http://www.wikidata.org/entity/>\n" +
@@ -23,7 +28,7 @@ public class SparqlClientJena {
     "}";
 
   public static void main(String[] args) {
-    SparqlClientJena sparqlClient = new SparqlClientJena();
+    JenaBasedSparqlClient sparqlClient = new JenaBasedSparqlClient();
     String label = sparqlClient.getLabel("Q19007672");
     System.err.println(label);
   }
@@ -49,5 +54,14 @@ public class SparqlClientJena {
       e.printStackTrace();
     }
     return value;
+  }
+
+  @Override
+  public Map<String, String> getLabels(List<String> entityIds) {
+    Map<String, String> labels = new HashMap<>();
+    for (String entityId : entityIds) {
+      labels.put(entityId, getLabel(entityId));
+    }
+    return labels;
   }
 }

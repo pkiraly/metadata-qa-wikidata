@@ -1,5 +1,6 @@
 package de.gwdg.metadataqa.wikidata.json;
 
+import org.apache.http.client.protocol.ResponseProcessCookies;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
@@ -19,6 +20,9 @@ public class ReaderClient {
     System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.client.protocol.ResponseProcessCookies", "fatal");
     java.util.logging.Logger.getLogger("org.apache.http.client.protocol.ResponseProcessCookies").setLevel(Level.OFF);
     System.getProperties().put("org.apache.commons.logging.simplelog.defaultlog", "fatal");
+
+    org.slf4j.LoggerFactory.getLogger(ResponseProcessCookies.class);
+    java.util.logging.Logger.getLogger(ResponseProcessCookies.class.getName()).setLevel(Level.OFF);
 
     String directory = "/media/kiru/Elements/projects/wikidata/";
     String propertiesFile = "/home/kiru/Documents/phd/wikidata/properties-12M.csv";

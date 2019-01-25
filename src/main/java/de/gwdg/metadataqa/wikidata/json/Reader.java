@@ -1,8 +1,9 @@
 package de.gwdg.metadataqa.wikidata.json;
 
-import com.jayway.jsonpath.JsonPath;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
+import de.gwdg.metadataqa.wikidata.json.labelextractor.JenaBasedSparqlClient;
+import de.gwdg.metadataqa.wikidata.json.labelextractor.WdClient;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -23,11 +24,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class Reader {
   private static final Pattern ENTITY_ID_PATTERN = Pattern.compile("^Q\\d+$");
-  private static final String WD_CMD_PATTERN = "wd data --props labels '%s'";
   private static final String API_URL_PATTERN =
     "https://www.wikidata.org/wiki/Special:EntityData/%s.json";
   public static final Charset CHARSET = Charset.forName("UTF-8");
@@ -46,7 +47,9 @@ public class Reader {
   private Map<String, String> entities = new HashMap<>();
   private int newEntities = 0;
   private static List<String> printableTypes = Arrays.asList("String", "Long", "Double");
-  private SparqlClientJena sparqlClient = new SparqlClientJena();
+  // private JenaBasedSparqlClient sparqlClient = new JenaBasedSparqlClient();
+  private LabelExtractor extractor;
+  private long duration = 0;
 
   public Reader(String propertiesFile, String entitiesFile) {
     this.propertiesFile = propertiesFile;
@@ -55,6 +58,8 @@ public class Reader {
     System.err.println("properties: " + properties.size());
     readCsv(entitiesFile, TYPE.ENTITIES);
     System.err.println("entities: " + entities.size());
+    extractor = new WdClient();
+    // extractor = new JenaBasedSparqlClient();
   }
 
   public void read(String jsonString) {
@@ -70,7 +75,7 @@ public class Reader {
       e.printStackTrace();
     }
 
-    if (newEntities >= 1000) {
+    if (newEntities >= 100) {
       saveEntities();
       newEntities = 0;
     }
@@ -138,16 +143,29 @@ public class Reader {
 
   private String resolveValue(Object value) {
     if (value instanceof String) {
+      long start = System.currentTimeMillis();
       String entityId = (String)value;
       if (ENTITY_ID_PATTERN.matcher(entityId).matches()) {
         if (!entities.containsKey(entityId)) {
-          String label = sparqlClient.getLabel(entityId);
-          // String label = readWd(entityId);
-          newEntities++;
-          entities.put(entityId, label);
+          if (extractor instanceof JenaBasedSparqlClient) {
+            String label = extractor.getLabel(entityId);
+            // String label = readWd(entityId);
+            newEntities++;
+            entities.put(entityId, label);
+            return entities.get(entityId);
+          } else if (extractor instanceof WdClient) {
+            Set<String> onHold = ((WdClient) extractor).getOnHold();
+            if (onHold.size() >= 10) {
+              entities.putAll(extractor.getLabels(new ArrayList<>(onHold)));
+              ((WdClient) extractor).clearOnHold();
+              return entities.get(entityId);
+            } else {
+              onHold.add(entityId);
+            }
+          }
         }
-        return entities.get(entityId);
       }
+      duration += (System.currentTimeMillis() - start);
     }
     return value.toString();
   }
@@ -222,28 +240,9 @@ public class Reader {
     String url = String.format(API_URL_PATTERN, entityId);
     try {
       String json = readJsonFromUrl(url);
-      label = extractEntityLabel(json);
+      label = Utils.extractEntityLabel(json);
     } catch (IOException e) {
       e.printStackTrace();
-    }
-    return label;
-  }
-
-  private String readWd(String entityId) {
-    String label = entityId;
-    try {
-      Runtime runtime = Runtime.getRuntime();
-      String cmd = String.format(WD_CMD_PATTERN, entityId);
-      Process process = runtime.exec(cmd);
-      process.waitFor();
-      String json = extractJsonFromWd(process.getInputStream());
-      label = extractEntityLabel(json);
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (Throwable t) {
-      t.printStackTrace();
     }
     return label;
   }
@@ -268,36 +267,9 @@ public class Reader {
     return sb.toString();
   }
 
-  private String extractJsonFromWd(InputStream inputStream) {
-    BufferedReader bufferedReader = new BufferedReader(
-      new InputStreamReader(inputStream));
-    StringBuffer json = new StringBuffer();
-
-    while (true) {
-      String line = null;
-      try {
-        if (!((line = bufferedReader.readLine()) != null)) break;
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-      json.append(line);
-    }
-    try {
-      bufferedReader.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    return json.toString();
-  }
-
-  private String extractEntityLabel(String json) {
-    return JsonPath.read(json, "$.labels.en.value");
-    //return labels.get(0);
-  }
-
   public void saveEntities() {
-    System.err.println("save entities: " + entities.size());
+    System.err.printf("save entities: %d (entities import took %s)", entities.size(), duration);
+    duration = 0;
     FileWriter writer = null;
     try {
       writer = new FileWriter(entitiesFile);

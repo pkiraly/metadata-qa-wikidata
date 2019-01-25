@@ -1,4 +1,4 @@
-package de.gwdg.metadataqa.wikidata.json;
+package de.gwdg.metadataqa.wikidata.json.labelextractor;
 
 /*
 import org.eclipse.rdf4j.RDF4JException;
@@ -22,7 +22,7 @@ import org.eclipse.rdf4j.sail.memory.MemoryStore;
 
 import java.util.List;
 
-public class SparqlCliendRdf4j {
+public class Rdf4jBasedSparqlCliend {
 
   String queryEndpointUrl;
   String updateEndpointUrl;
