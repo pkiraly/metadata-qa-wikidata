@@ -13,18 +13,18 @@ public class ReaderClient {
   public static void main(String[] args) throws IOException, ParseException {
 
     String directory = "/media/kiru/Elements/projects/wikidata/";
-    String propertyFile = "/home/kiru/Documents/phd/wikidata/properties-12M.csv";
+    String propertiesFile = "/home/kiru/Documents/phd/wikidata/properties-12M.csv";
     String entitiesFile = "/home/kiru/Documents/phd/wikidata/entities-12M.csv";
     String[] fileNames = new String[]{"wikidata-20171211-publications.ndjson"};
-    Reader reader = new Reader(propertyFile);
+    Reader reader = new Reader(propertiesFile, entitiesFile);
 
     Stream<String> lines = null;
     try {
       lines = Files.lines(Paths.get(directory + fileNames[0]));
       lines.forEach(item -> {
         reader.read(item);
-        if (reader.getRecordCounter() == 100)
-          throw new BreakException();
+        // if (reader.getRecordCounter() == 100)
+        //   throw new BreakException();
       });
     } catch (IOException e) {
       e.printStackTrace();

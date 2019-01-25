@@ -7,6 +7,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 
 public class SparqlClientJena {
 
@@ -32,6 +33,7 @@ public class SparqlClientJena {
 
     String value = entityId;
     try (QueryExecution qexec = QueryExecutionFactory.sparqlService(SPARQL_ENDPOINT, query)) {
+      ((QueryEngineHTTP)qexec).addParam("timeout", "10000");
       ResultSet rs = qexec.execSelect();
       while (rs.hasNext()) {
         QuerySolution hit = rs.next();

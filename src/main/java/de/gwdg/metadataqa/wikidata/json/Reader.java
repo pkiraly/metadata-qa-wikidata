@@ -15,7 +15,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -33,6 +32,11 @@ public class Reader {
 		"https://www.wikidata.org/wiki/Special:EntityData/%s.json";
 	public static final Charset CHARSET = Charset.forName("UTF-8");
 
+	private enum TYPE {
+		PROPERTIES,
+		ENTITIES;
+	}
+
 	private static int recordCounter = 0;
 	private static Map<String, Integer> container = new HashMap<>();
 	private static JSONParser parser = new JSONParser();
@@ -43,8 +47,11 @@ public class Reader {
 
 	public Reader() {}
 
-	public Reader(String propertiesFile) {
-		readProperties(propertiesFile);
+	public Reader(String propertiesFile, String entitiesFile) {
+		readCsv(propertiesFile, TYPE.PROPERTIES);
+		System.err.println("properties: " + properties.size());
+		readCsv(entitiesFile, TYPE.ENTITIES);
+		System.err.println("entities: " + entities.size());
 	}
 
 	public void read(String jsonString) {
@@ -156,18 +163,28 @@ public class Reader {
 		return container;
 	}
 
-	private void readProperties(String csvFile) {
+	private void readCsv(String csvFile, TYPE type) {
 		CSVReader reader = null;
+		int i = 0;
 		try {
 			reader = new CSVReader(new FileReader(csvFile));
 			String[] line;
 			while ((line = reader.readNext()) != null) {
-				WikidataProperty property = new WikidataProperty(line[0], line[1], line[3]);
-				properties.put(property.getId(), property);
+				if (type.equals(TYPE.PROPERTIES)) {
+					WikidataProperty property = new WikidataProperty(line[0], line[1], line[3]);
+					properties.put(property.getId(), property);
+				} else if (type.equals(TYPE.ENTITIES)) {
+					System.err.println(line[0]);
+					entities.put(line[0], line[1]);
+				}
+				i++;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		System.err.println(type.name() + " " + i);
 	}
 
 	private String resolvePath(List<String> path) {
@@ -272,7 +289,7 @@ public class Reader {
 		try {
 			writer = new FileWriter(entitiesFile);
 			//using custom delimiter and quote character
-			CSVWriter csvWriter = new CSVWriter(writer, '#', '\'');
+			CSVWriter csvWriter = new CSVWriter(writer);
 
 			List<String[]> data = toStringArray();
 
