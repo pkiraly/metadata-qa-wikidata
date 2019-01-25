@@ -45,7 +45,7 @@ public class Reader {
   private static JSONParser parser = new JSONParser();
   private Map<String, WikidataProperty> properties = new HashMap<>();
   private Map<String, String> entities = new HashMap<>();
-  private int newEntities = 0;
+  private int newEntitiesCount = 0;
   private static List<String> printableTypes = Arrays.asList("String", "Long", "Double");
   // private JenaBasedSparqlClient sparqlClient = new JenaBasedSparqlClient();
   private LabelExtractor extractor;
@@ -75,9 +75,9 @@ public class Reader {
       e.printStackTrace();
     }
 
-    if (newEntities >= 100) {
+    if (newEntitiesCount >= 1000) {
       saveEntities();
-      newEntities = 0;
+      newEntitiesCount = 0;
     }
   }
 
@@ -150,13 +150,15 @@ public class Reader {
           if (extractor instanceof JenaBasedSparqlClient) {
             String label = extractor.getLabel(entityId);
             // String label = readWd(entityId);
-            newEntities++;
+            newEntitiesCount++;
             entities.put(entityId, label);
             return entities.get(entityId);
           } else if (extractor instanceof WdClient) {
             Set<String> onHold = ((WdClient) extractor).getOnHold();
-            if (onHold.size() >= 10) {
-              entities.putAll(extractor.getLabels(new ArrayList<>(onHold)));
+            if (onHold.size() >= 20) {
+              Map<String, String> labels = extractor.getLabels(new ArrayList<>(onHold));
+              entities.putAll(labels);
+              newEntitiesCount += labels.size();
               ((WdClient) extractor).clearOnHold();
               return entities.get(entityId);
             } else {
@@ -268,7 +270,7 @@ public class Reader {
   }
 
   public void saveEntities() {
-    System.err.printf("save entities: %d (entities import took %s)", entities.size(), duration);
+    System.err.printf("save entities: %d (entities import took %d)\n", entities.size(), duration);
     duration = 0;
     FileWriter writer = null;
     try {
