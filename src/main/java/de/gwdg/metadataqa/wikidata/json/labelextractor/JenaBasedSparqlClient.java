@@ -13,6 +13,7 @@ import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class JenaBasedSparqlClient implements LabelExtractor {
 
@@ -63,5 +64,20 @@ public class JenaBasedSparqlClient implements LabelExtractor {
       labels.put(entityId, getLabel(entityId));
     }
     return labels;
+  }
+
+  @Override
+  public void addOnHold(String entityId) {
+
+  }
+
+  @Override
+  public void clearOnHold() {
+
+  }
+
+  @Override
+  public Set<String> getOnHold() {
+    return null;
   }
 }

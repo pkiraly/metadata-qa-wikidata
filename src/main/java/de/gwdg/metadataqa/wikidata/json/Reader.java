@@ -65,31 +65,39 @@ public class Reader {
   public void read(String jsonString) {
     recordCounter++;
 
-    if (recordCounter % 5000 == 0)
+    if (recordCounter % 100000 == 0)
       System.err.println(recordCounter);
     try {
       Object obj = parser.parse(jsonString);
-      JSONObject jsonObject = (JSONObject) obj;
-      process(new ArrayList<>(), jsonObject);
+      JSONObject input = (JSONObject) obj;
+      JSONObject output = process(new ArrayList<>(), input);
+      // JSONObject output = process(true, input);
+      // System.err.println(output.toJSONString());
     } catch (ParseException e) {
       e.printStackTrace();
     }
 
-    if (newEntitiesCount >= 1000) {
+    if (newEntitiesCount >= 100) {
+      System.err.println("newEntitiesCount: " + newEntitiesCount);
       saveEntities();
       newEntitiesCount = 0;
     }
   }
 
-  private void process(List<String> path, JSONObject jsonObject) {
+  private JSONObject process(List<String> path, JSONObject jsonObject) {
+    JSONObject record = new JSONObject();
     for (Object keyObj : jsonObject.keySet()) {
       String key = (String) keyObj;
       Object value = jsonObject.get(keyObj);
       String type = value.getClass().getSimpleName();
-      if (path.contains("claims") && printableTypes.contains(type)) {
-        final String resolvedPath = resolvePath(path);
-        final String resolvedValue = resolveValue(value.toString());
-        // System.err.printf("O: %s/%s: %s\n", resolvedPath, key, resolvedValue);
+      String resolvedPath = null;
+      if (path.contains("claims")) {// && printableTypes.contains(type)) {
+        resolvedPath = resolvePath(path);
+        if (printableTypes.contains(type)) {
+          final String resolvedValue = resolveValue(value.toString());
+          record.put(resolvedPath, resolvedValue);
+          // System.err.printf("O: %s/%s: %s\n", resolvedPath, key, resolvedValue);
+        }
       }
 
       if (type.equals("String")) {
@@ -106,10 +114,68 @@ public class Reader {
         System.err.println("unknown type [in object]: " + type);
       }
     }
+    return record;
+  }
+
+  private JSONObject process(boolean isRoot, JSONObject input) {
+    JSONObject record = new JSONObject();
+    for (Object keyObj : input.keySet()) {
+      String key = (String) keyObj;
+      Object value = input.get(keyObj);
+      String type = value.getClass().getSimpleName();
+      boolean processChild = !isRoot || key.equals("claims");
+      String resolvedProperty = resolveProperty(key);
+      System.err.printf("%s - %s, %s%n", key, isRoot, processChild);
+
+      if (processChild) {
+        if (type.equals("String")) {
+          record.put(resolvedProperty, resolveValue((String)value));
+        } else if (type.equals("Long")) {
+          record.put(resolvedProperty, value);
+        } else if (type.equals("Double")) {
+          record.put(resolvedProperty, value);
+        } else if (type.equals("JSONArray")) {
+          record.put(resolvedProperty, process((JSONArray)value));
+        } else if (type.equals("JSONObject")) {
+          record.put(resolvedProperty, process(false, (JSONObject)value));
+        } else {
+          System.err.println("unknown type [in object]: " + type);
+        }
+      }
+    }
+    return record;
   }
 
   private String resolveProperty(String propertyId) {
+    if (properties.containsKey(propertyId))
+      return properties.get(propertyId).getLabel();
     return propertyId;
+  }
+
+  private JSONArray process(JSONArray jsonArray) {
+    JSONArray output = new JSONArray();
+    Iterator it = jsonArray.iterator();
+    int i = 0;
+    if (it.hasNext()) {
+      Object item = it.next();
+      String type = item.getClass().getSimpleName();
+
+      if (type.equals("String")) {
+        output.add(item);
+      } else if (type.equals("Long")) {
+        output.add(item);
+      } else if (type.equals("Double")) {
+        output.add(item);
+      } else if (type.equals("JSONArray")) {
+        output.add(process((JSONArray)item));
+      } else if (type.equals("JSONObject")) {
+        output.add(process(true, (JSONObject)item));
+      } else {
+        System.err.println("unknown type [array]: " + type);
+      }
+      i++;
+    }
+    return output;
   }
 
   private void process(List<String> path, JSONArray jsonArray) {
@@ -120,7 +186,7 @@ public class Reader {
       String type = item.getClass().getSimpleName();
       if (path.contains("claims") && printableTypes.contains(type)) {
         final String resolvedPath = resolvePath(path);
-        final String resolvedValue = resolveValue(item);
+        // final String resolvedValue = resolveValue(item);
         // System.err.printf("A: %s/%s: %s\n", resolvedPath, i, resolvedValue);
       }
 
@@ -141,35 +207,55 @@ public class Reader {
     }
   }
 
-  private String resolveValue(Object value) {
+  private String resolveValue(String value) {
+    String resolvedValue = value;
     if (value instanceof String) {
       long start = System.currentTimeMillis();
-      String entityId = (String)value;
+      String entityId = value;
       if (ENTITY_ID_PATTERN.matcher(entityId).matches()) {
         if (!entities.containsKey(entityId)) {
+          // System.err.println(entityId);
           if (extractor instanceof JenaBasedSparqlClient) {
             String label = extractor.getLabel(entityId);
             // String label = readWd(entityId);
             newEntitiesCount++;
             entities.put(entityId, label);
-            return entities.get(entityId);
+            resolvedValue = entities.get(entityId);
           } else if (extractor instanceof WdClient) {
-            Set<String> onHold = ((WdClient) extractor).getOnHold();
+            extractor.addOnHold(entityId);
+            Set<String> onHold = extractor.getOnHold();
             if (onHold.size() >= 20) {
               Map<String, String> labels = extractor.getLabels(new ArrayList<>(onHold));
-              entities.putAll(labels);
+              // System.err.println("trigger: " + entityId);
+              // System.err.println("on hold: " + StringUtils.join(extractor.getOnHold(), ", "));
+              // System.err.println("labels: " + StringUtils.join(labels.keySet(), ", "));
+              for (Map.Entry<String, String> label : labels.entrySet()) {
+                if (label.equals(entityId)) {
+                  System.err.println("THIS IS THE TRIGGER");
+                }
+                if (!entities.containsKey(label.getKey())) {
+                  entities.put(label.getKey(), label.getValue());
+                } else {
+                  System.err.printf("already there %s: '%s' vs '%s'%n",
+                    label.getKey(), label.getValue(), entities.get(label.getKey()));
+                }
+              }
               newEntitiesCount += labels.size();
-              ((WdClient) extractor).clearOnHold();
-              return entities.get(entityId);
-            } else {
-              onHold.add(entityId);
+              System.err.printf(
+                "<-extractor.getLabels() %d new / %d total%n",
+                newEntitiesCount, entities.size()
+              );
+              extractor.clearOnHold();
+              resolvedValue = entities.get(entityId);
             }
           }
+        } else {
+          resolvedValue = entities.get(entityId);
         }
       }
       duration += (System.currentTimeMillis() - start);
     }
-    return value.toString();
+    return resolvedValue;
   }
 
   private static List<String> buildPath(List<String> path, String key) {
@@ -198,10 +284,10 @@ public class Reader {
 
   private void readCsv(String csvFile, TYPE type) {
     CSVReader reader = null;
-    int i = 0;
+    int lineNumber = 0;
+    String[] line = null;
     try {
       reader = new CSVReader(new FileReader(csvFile));
-      String[] line;
       while ((line = reader.readNext()) != null) {
         if (type.equals(TYPE.PROPERTIES)) {
           WikidataProperty property = new WikidataProperty(line[0], line[1], line[3]);
@@ -209,14 +295,18 @@ public class Reader {
         } else if (type.equals(TYPE.ENTITIES)) {
           entities.put(line[0], line[1]);
         }
-        i++;
+        lineNumber++;
       }
     } catch (IOException e) {
+      System.err.println("line number: " + lineNumber);
+      System.err.println("last good line: " + StringUtils.join(line, " // "));
       e.printStackTrace();
+      throw new IllegalArgumentException("Wrong CSV file: " + csvFile);
     } catch (Exception e) {
       e.printStackTrace();
+      throw new IllegalArgumentException("Wrong CSV file: " + csvFile);
     }
-    System.err.println(type.name() + " " + i);
+    System.err.println(type.name() + " " + lineNumber);
   }
 
   private String resolvePath(List<String> path) {
@@ -269,8 +359,28 @@ public class Reader {
     return sb.toString();
   }
 
+  public void postProcess() {
+    if (extractor instanceof WdClient) {
+      Set<String> onHold = ((WdClient) extractor).getOnHold();
+      if (onHold.size() > 0) {
+        Map<String, String> labels = extractor.getLabels(new ArrayList<>(onHold));
+        entities.putAll(labels);
+        newEntitiesCount += labels.size();
+        ((WdClient) extractor).clearOnHold();
+      }
+    }
+  }
+
   public void saveEntities() {
-    System.err.printf("save entities: %d (entities import took %d)\n", entities.size(), duration);
+    if (newEntitiesCount == 0)
+      return;
+
+    System.err.printf(
+      "save entities: %d new/%d total (entities import took %d ms)\n",
+      newEntitiesCount,
+      entities.size(),
+      duration
+    );
     duration = 0;
     FileWriter writer = null;
     try {

@@ -1,6 +1,5 @@
 package de.gwdg.metadataqa.wikidata.json.labelextractor;
 
-import com.jayway.jsonpath.JsonPath;
 import de.gwdg.metadataqa.wikidata.json.LabelExtractor;
 import de.gwdg.metadataqa.wikidata.json.Utils;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +22,7 @@ public class WdClient implements LabelExtractor {
   private static final String WD_DATA_CMD_PATTERN = "wd data --props labels '%s'";
   private static final String WD_LABEL_CMD_PATTERN = "wd label --lang en %s";
   private static final Pattern LABEL_OUTPUT = Pattern.compile("^(Q\\d+) +(.*)$");
+  private boolean supposeSameOrder = true;
   private final Runtime runtime;
   private Set<String> onHold;
 
@@ -64,9 +64,13 @@ public class WdClient implements LabelExtractor {
     Map<String, String> labels = new HashMap<>();
     try {
       String cmd = String.format(WD_LABEL_CMD_PATTERN, StringUtils.join(entityIds, " "));
+      // System.err.println(cmd);
       Process process = runtime.exec(cmd);
       process.waitFor();
-      labels = extractFromLabelOutput(process.getInputStream());
+      labels = extractFromLabelOutput(process.getInputStream(), entityIds);
+      if (entityIds.size() != labels.size()) {
+        System.err.printf("entities: %d, labels: %d%n", entityIds.size(), labels.size());
+      }
       // label = extractEntityLabel(json);
     } catch (IOException e) {
       e.printStackTrace();
@@ -102,20 +106,34 @@ public class WdClient implements LabelExtractor {
     return json.toString();
   }
 
-  private Map<String, String> extractFromLabelOutput(InputStream inputStream) {
+  private Map<String, String> extractFromLabelOutput(InputStream inputStream,
+                                                     List<String> entityIds) {
     BufferedReader bufferedReader = new BufferedReader(
       new InputStreamReader(inputStream));
     StringBuffer json = new StringBuffer();
 
     Map<String, String> labels = new HashMap<>();
+    int lineNumber = 0;
     while (true) {
       try {
         String line = null;
         if (!((line = bufferedReader.readLine()) != null)) break;
         Matcher matcher = LABEL_OUTPUT.matcher(line);
         if (matcher.matches()) {
-          labels.put(matcher.group(1), matcher.group(2));
+          String entityId = matcher.group(1);
+          String label = matcher.group(2);
+          if (entityId.equals(entityIds.get(lineNumber))) {
+            labels.put(entityId, label);
+          } else if (supposeSameOrder) {
+            labels.put(entityIds.get(lineNumber), label);
+          }
+        } else {
+          System.err.println("Unexpected line: " + line);
+          if (entityIds.size() == 1) {
+            labels.put(entityIds.get(lineNumber), line);
+          }
         }
+        lineNumber++;
       } catch (IOException e) {
         e.printStackTrace();
       }
@@ -129,11 +147,19 @@ public class WdClient implements LabelExtractor {
     return labels;
   }
 
+  @Override
   public Set<String> getOnHold() {
     return onHold;
   }
 
+  @Override
   public void clearOnHold() {
     onHold = new HashSet<>();
   }
+
+  @Override
+  public void addOnHold(String entityId) {
+    onHold.add(entityId);
+  }
+
 }

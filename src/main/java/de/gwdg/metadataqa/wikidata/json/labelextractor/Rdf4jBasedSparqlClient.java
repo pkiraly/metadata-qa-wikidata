@@ -22,7 +22,7 @@ import org.eclipse.rdf4j.sail.memory.MemoryStore;
 
 import java.util.List;
 
-public class Rdf4jBasedSparqlCliend {
+public class Rdf4jBasedSparqlClient {
 
   String queryEndpointUrl;
   String updateEndpointUrl;
