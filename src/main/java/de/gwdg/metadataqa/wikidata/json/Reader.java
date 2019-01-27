@@ -11,11 +11,14 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -50,6 +53,8 @@ public class Reader {
   // private JenaBasedSparqlClient sparqlClient = new JenaBasedSparqlClient();
   private LabelExtractor extractor;
   private long duration = 0;
+  private String command = "transformation";
+  PrintWriter out = null;
 
   public Reader(String propertiesFile, String entitiesFile) {
     this.propertiesFile = propertiesFile;
@@ -60,6 +65,17 @@ public class Reader {
     System.err.println("entities: " + entities.size());
     extractor = new WdClient();
     // extractor = new JenaBasedSparqlClient();
+    FileWriter fw = null;
+    try {
+      File outputFile = new File("myfile.txt");
+      if (outputFile.exists())
+        outputFile.delete();
+      fw = new FileWriter(outputFile, true);
+      BufferedWriter bw = new BufferedWriter(fw);
+      out = new PrintWriter(bw);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   public void read(String jsonString) {
@@ -70,9 +86,12 @@ public class Reader {
     try {
       Object obj = parser.parse(jsonString);
       JSONObject input = (JSONObject) obj;
-      JSONObject output = process(new ArrayList<>(), input);
-      // JSONObject output = process(true, input);
-      // System.err.println(output.toJSONString());
+      if (command.equals("transformation")) {
+        JSONObject output = process(true, input);
+        out.println(output.toJSONString());
+      } else {
+        JSONObject output = process(new ArrayList<>(), input);
+      }
     } catch (ParseException e) {
       e.printStackTrace();
     }
@@ -125,7 +144,7 @@ public class Reader {
       String type = value.getClass().getSimpleName();
       boolean processChild = !isRoot || key.equals("claims");
       String resolvedProperty = resolveProperty(key);
-      System.err.printf("%s - %s, %s%n", key, isRoot, processChild);
+      // System.err.printf("%s - is root: %s, processChild: %s%n", key, isRoot, processChild);
 
       if (processChild) {
         if (type.equals("String")) {
@@ -161,7 +180,7 @@ public class Reader {
       String type = item.getClass().getSimpleName();
 
       if (type.equals("String")) {
-        output.add(item);
+        output.add(resolveValue((String)item));
       } else if (type.equals("Long")) {
         output.add(item);
       } else if (type.equals("Double")) {
@@ -369,6 +388,7 @@ public class Reader {
         ((WdClient) extractor).clearOnHold();
       }
     }
+    out.close();
   }
 
   public void saveEntities() {
