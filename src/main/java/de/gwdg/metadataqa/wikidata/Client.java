@@ -37,9 +37,10 @@ public class Client {
     String propertiesFile = parameters.getPropertyFile();
     String entitiesFile = parameters.getEntityFile();
     String input = parameters.getInputFile();
+    int processingLimit = parameters.getProcessingLimit();
+
     Reader reader = new Reader(propertiesFile, entitiesFile);
     reader.setOutputFileName(parameters.getOutputFile());
-    int processingLimit = 0;
 
     Stream<String> lines = null;
     try {

@@ -22,6 +22,7 @@ public class CliParameters {
     options.addOption("p", "property-file", true, "property file");
     options.addOption("e", "entity-file", true, "entity file");
     options.addOption("c", "command", true, "command");
+    options.addOption("l", "processing-limit", true, "command");
     options.addOption("h", "help", false, "help");
   }
 
@@ -31,6 +32,7 @@ public class CliParameters {
   private String entityFile;
   private boolean help = false;
   private Command command;
+  private int processingLimit = 0;
 
   public CliParameters(String[] arguments) throws ParseException {
     CommandLine cmd = parser.parse(options, arguments);
@@ -59,6 +61,10 @@ public class CliParameters {
       entityFile = cmd.getOptionValue("entity-file");
     }
 
+    if (cmd.hasOption("processing-limit")) {
+      processingLimit = Integer.parseInt(cmd.getOptionValue("processing-limit"));
+    }
+
     if (cmd.hasOption("help"))
       help = true;
   }
@@ -79,6 +85,14 @@ public class CliParameters {
     return entityFile;
   }
 
+  public Command getCommand() {
+    return command;
+  }
+
+  public int getProcessingLimit() {
+    return processingLimit;
+  }
+
   public boolean showHelp() {
     return help;
   }
@@ -95,6 +109,7 @@ public class CliParameters {
       "output-file='" + outputFile + '\'' + "\n" +
       "property-file='" + propertyFile + '\'' + "\n" +
       "entity-file='" + entityFile + '\'' + "\n" +
+      "processing-limit='" + processingLimit + '\'' + "\n" +
       "help=" + help + "\n";
   }
 }
