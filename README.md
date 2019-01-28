@@ -4,4 +4,4 @@ This research project aims to reveal some quality issues of the bibliographic da
 
 Researchers (in alphabetic order): Péter Király and Jakob Voß
 
-More details: [wiki](wiki)
+See more details on [the wiki pages](https://github.com/pkiraly/metadata-qa-wikidata/wiki).
