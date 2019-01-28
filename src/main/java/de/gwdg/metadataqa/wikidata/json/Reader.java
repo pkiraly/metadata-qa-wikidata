@@ -54,7 +54,7 @@ public class Reader {
   private LabelExtractor extractor;
   private long duration = 0;
   private String command = "transformation";
-  PrintWriter out = null;
+  private PrintWriter out = null;
 
   public Reader(String propertiesFile, String entitiesFile) {
     this.propertiesFile = propertiesFile;
@@ -65,17 +65,6 @@ public class Reader {
     System.err.println("entities: " + entities.size());
     extractor = new WdClient();
     // extractor = new JenaBasedSparqlClient();
-    FileWriter fw = null;
-    try {
-      File outputFile = new File("myfile.txt");
-      if (outputFile.exists())
-        outputFile.delete();
-      fw = new FileWriter(outputFile, true);
-      BufferedWriter bw = new BufferedWriter(fw);
-      out = new PrintWriter(bw);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
   }
 
   public void read(String jsonString) {
@@ -428,5 +417,19 @@ public class Reader {
     }
 
     return records;
+  }
+
+  public void setOutputFileName(String outputFileName) {
+    FileWriter fw = null;
+    try {
+      File outputFile = new File(outputFileName);
+      if (outputFile.exists())
+        outputFile.delete();
+      fw = new FileWriter(outputFile, true);
+      BufferedWriter bw = new BufferedWriter(fw);
+      out = new PrintWriter(bw);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 }

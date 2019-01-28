@@ -10,11 +10,18 @@ public class CliParameters {
   protected static Options options = new Options();
   protected static final CommandLineParser parser = new DefaultParser();
 
+  public enum Command {
+    TRANSFORMATION,
+    READ,
+    ENTITY_RESOLUTION;
+  }
+
   static {
     options.addOption("i", "input-file", true, "input JSON dump");
     options.addOption("o", "output-file", true, "output JSON dump");
     options.addOption("p", "property-file", true, "property file");
     options.addOption("e", "entity-file", true, "entity file");
+    options.addOption("c", "command", true, "command");
     options.addOption("h", "help", false, "help");
   }
 
@@ -23,9 +30,18 @@ public class CliParameters {
   private String propertyFile;
   private String entityFile;
   private boolean help = false;
+  private Command command;
 
   public CliParameters(String[] arguments) throws ParseException {
     CommandLine cmd = parser.parse(options, arguments);
+
+    if (cmd.hasOption("command")) {
+      try {
+        command = Command.valueOf(cmd.getOptionValue("command"));
+      } catch (IllegalArgumentException e) {
+        throw new ParseException(cmd.getOptionValue("command") + " is not a valid command!");
+      }
+    }
 
     if (cmd.hasOption("input-file")) {
       inputFile = cmd.getOptionValue("input-file");
@@ -74,6 +90,7 @@ public class CliParameters {
   @Override
   public String toString() {
     return "parameters: " + "\n" +
+      "command='" + command + '\'' + "\n" +
       "input-file='" + inputFile + '\'' + "\n" +
       "output-file='" + outputFile + '\'' + "\n" +
       "property-file='" + propertyFile + '\'' + "\n" +

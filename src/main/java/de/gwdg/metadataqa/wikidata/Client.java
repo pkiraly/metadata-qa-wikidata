@@ -1,5 +1,9 @@
-package de.gwdg.metadataqa.wikidata.json;
+package de.gwdg.metadataqa.wikidata;
 
+import de.gwdg.metadataqa.wikidata.json.BreakException;
+import de.gwdg.metadataqa.wikidata.json.CliParameters;
+import de.gwdg.metadataqa.wikidata.json.Reader;
+import de.gwdg.metadataqa.wikidata.json.Utils;
 import org.apache.commons.cli.HelpFormatter;
 import org.json.simple.parser.ParseException;
 
@@ -9,17 +13,18 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public class ReaderClient {
+public class Client {
 
-  public static void main(String[] args) throws IOException, ParseException {
+  public static void main(String[] args) {
 
     long start = System.currentTimeMillis();
     CliParameters parameters = null;
     try {
       parameters = new CliParameters(args);
     } catch (org.apache.commons.cli.ParseException e) {
+      System.out.printf("ERROR: %s%n", e.getLocalizedMessage());
       printHelp();
-      e.printStackTrace();
+      System.exit(1);
     }
 
     if (parameters.showHelp()) {
@@ -27,21 +32,13 @@ public class ReaderClient {
       System.exit(1);
     }
 
-    System.out.print(parameters.toString());
+    System.out.println(parameters.toString());
 
-    // System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.client.protocol.ResponseProcessCookies", "fatal");
-    // java.util.logging.Logger.getLogger("org.apache.http.client.protocol.ResponseProcessCookies").setLevel(Level.OFF);
-    // System.getProperties().put("org.apache.commons.logging.simplelog.defaultlog", "fatal");
-
-    // org.slf4j.LoggerFactory.getLogger(ResponseProcessCookies.class);
-    // java.util.logging.Logger.getLogger(ResponseProcessCookies.class.getName()).setLevel(Level.OFF);
-
-    // String directory = parameters.getInputFile(); //"/media/kiru/Elements/projects/wikidata/";
-    String propertiesFile = parameters.getPropertyFile(); // "/home/kiru/Documents/phd/wikidata/properties-12M.csv";
-    String entitiesFile = parameters.getEntityFile(); // "/home/kiru/Documents/phd/wikidata/entities-12M.csv";
-    // String[] fileNames = new String[]{"wikidata-20171211-publications.ndjson"};
+    String propertiesFile = parameters.getPropertyFile();
+    String entitiesFile = parameters.getEntityFile();
     String input = parameters.getInputFile();
     Reader reader = new Reader(propertiesFile, entitiesFile);
+    reader.setOutputFileName(parameters.getOutputFile());
     int processingLimit = 0;
 
     Stream<String> lines = null;
@@ -64,7 +61,6 @@ public class ReaderClient {
     reader.saveEntities();
 
     System.err.println(reader.getRecordCounter());
-    // System.err.println(container);
     Map<String, Integer> container = reader.getContainer();
     // container.keySet().stream().forEach(
     //   s -> System.out.printf("%s: %d\n", s, container.get(s))
@@ -76,7 +72,7 @@ public class ReaderClient {
 
   private static void printHelp() {
     HelpFormatter formatter = new HelpFormatter();
-    String message = String.format("java -cp metadata-qa-wikidata.jar %s [options] [file]", ReaderClient.class.getCanonicalName());
+    String message = String.format("java -cp wikidata-0.1.jar %s [options] [file]", Client.class.getCanonicalName());
     formatter.printHelp(message, CliParameters.getOptions());
   }
 }
