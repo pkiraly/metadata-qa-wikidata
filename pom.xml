@@ -6,6 +6,41 @@
 	<packaging>jar</packaging>
 	<version>0.1-SNAPSHOT</version>
 
+	<developers>
+		<developer>
+			<id>pkiraly</id>
+			<name>Király Péter</name>
+			<email>kirunews@gmail.com</email>
+			<url>https://github.com/pkiraly</url>
+			<organization>GWDG</organization>
+			<organizationUrl>http://gwdg.de</organizationUrl>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<id>nichtich</id>
+			<name>Jakob Voß</name>
+			<email>mail@jakobvoss.de</email>
+			<url>https://github.com/nichtich</url>
+			<organization>Verbundzentrale des GBV (VZG)</organization>
+			<organizationUrl>http://gwdg.de</organizationUrl>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:git@github.com:pkiraly/metadata-qa-wikidata.git</connection>
+		<developerConnection>scm:git:git@github.com:pkiraly/metadata-qa-wikidata.git</developerConnection>
+		<url>http://github.com/pkiraly/metadata-qa-wikidata</url>
+	</scm>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -13,12 +48,7 @@
 		<rdf4j.version>2.4.3</rdf4j.version>
 	</properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.wikidata.wdtk</groupId>
-      <artifactId>wdtk-dumpfiles</artifactId>
-      <version>0.9.0</version>
-    </dependency>
+	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -142,6 +172,16 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>1.6.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.wikidata.wdtk</groupId>
+			<artifactId>wdtk-dumpfiles</artifactId>
+			<version>0.9.0</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-cli</groupId>
+			<artifactId>commons-cli</artifactId>
+			<version>1.3.1</version>
 		</dependency>
 	</dependencies>
 
