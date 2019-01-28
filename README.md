@@ -22,5 +22,7 @@ java -cp target/wikidata-0.1-SNAPSHOT.jar de.gwdg.metadataqa.wikidata.json.Reade
   --entity-file path/to/entities-12M.csv
 ```
 
+Properties and entities files (property-file, entity-file parameters) will be provided in the project in the future.
+
 # More details
 See [the wiki pages](https://github.com/pkiraly/metadata-qa-wikidata/wiki).
