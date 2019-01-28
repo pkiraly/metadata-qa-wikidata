@@ -11,22 +11,24 @@ public class CliParameters {
   protected static final CommandLineParser parser = new DefaultParser();
 
   static {
-    options.addOption("i", "input-dump", true, "input JSON dump");
+    options.addOption("i", "input-file", true, "input JSON dump");
     options.addOption("o", "output-file", true, "output JSON dump");
     options.addOption("p", "property-file", true, "property file");
     options.addOption("e", "entity-file", true, "entity file");
+    options.addOption("h", "help", false, "help");
   }
 
-  private String inputDump;
+  private String inputFile;
   private String outputFile;
   private String propertyFile;
   private String entityFile;
+  private boolean help = false;
 
   public CliParameters(String[] arguments) throws ParseException {
     CommandLine cmd = parser.parse(options, arguments);
 
-    if (cmd.hasOption("input-dump")) {
-      inputDump = cmd.getOptionValue("input-dump");
+    if (cmd.hasOption("input-file")) {
+      inputFile = cmd.getOptionValue("input-file");
     }
 
     if (cmd.hasOption("output-file")) {
@@ -40,10 +42,13 @@ public class CliParameters {
     if (cmd.hasOption("entity-file")) {
       entityFile = cmd.getOptionValue("entity-file");
     }
+
+    if (cmd.hasOption("help"))
+      help = true;
   }
 
-  public String getInputDump() {
-    return inputDump;
+  public String getInputFile() {
+    return inputFile;
   }
 
   public String getOutputFile() {
@@ -56,5 +61,23 @@ public class CliParameters {
 
   public String getEntityFile() {
     return entityFile;
+  }
+
+  public boolean showHelp() {
+    return help;
+  }
+
+  public static Options getOptions() {
+    return options;
+  }
+
+  @Override
+  public String toString() {
+    return "parameters: " + "\n" +
+      "input-file='" + inputFile + '\'' + "\n" +
+      "output-file='" + outputFile + '\'' + "\n" +
+      "property-file='" + propertyFile + '\'' + "\n" +
+      "entity-file='" + entityFile + '\'' + "\n" +
+      "help=" + help + "\n";
   }
 }
