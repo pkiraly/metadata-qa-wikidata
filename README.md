@@ -16,13 +16,14 @@ mvn clean install
 
 ```
 java -cp target/wikidata-0.1-SNAPSHOT.jar de.gwdg.metadataqa.wikidata.Client \
-  --input-file path/to/wikidata-[version]-publications.ndjson \
-  --output-file path/to/transformed.json \
-  --property-file path/to/properties-12M.csv \
-  --entity-file path/to/entities-12M.csv
+  --input-file data/wikidata-[version]-publications.ndjson \
+  --output-file data/transformed.json \
+  --property-file data/properties-12M.csv \
+  --entity-file data/entities-12M.csv
 ```
 
-Properties and entities files (property-file, entity-file parameters) will be provided in the project in the future.
+Properties and entities files to be located in the `data/` directory (property-file, entity-file parameters) will be provided in the project in the future.
 
 # More details
+
 See [the wiki pages](https://github.com/pkiraly/metadata-qa-wikidata/wiki).
