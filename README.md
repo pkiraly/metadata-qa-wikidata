@@ -15,7 +15,7 @@ mvn clean install
 ### run it
 
 ```
-java -cp target/wikidata-0.1-SNAPSHOT.jar de.gwdg.metadataqa.wikidata.json.ReaderClient \
+java -cp target/wikidata-0.1-SNAPSHOT.jar de.gwdg.metadataqa.wikidata.Client \
   --input-file path/to/wikidata-[version]-publications.ndjson \
   --output-file path/to/transformed.json \
   --property-file path/to/properties-12M.csv \
