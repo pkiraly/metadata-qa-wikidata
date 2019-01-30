@@ -24,7 +24,7 @@ public class ClassExtractorTest {
   @Test
   public void testExtractor() {
 
-    String entitiesFile = "data/entities-12M.csv";
+    String entitiesFile = "src/test/resources/entities.csv";
     ClassExtractor extractor = new ClassExtractor(entitiesFile);
     // System.err.println(new File(entitiesFile).getAbsolutePath());
   }
