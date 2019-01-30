@@ -3,7 +3,6 @@ package de.gwdg.metadataqa.wikidata.json;
 import de.gwdg.metadataqa.wikidata.json.labelextractor.JenaBasedSparqlClient;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertTrue;
@@ -23,9 +22,10 @@ public class ClassExtractorTest {
 
   @Test
   public void testExtractor() {
-
     String entitiesFile = "src/test/resources/entities.csv";
     ClassExtractor extractor = new ClassExtractor(entitiesFile);
+    extractor.resolveAll();
+    extractor.saveEntities("src/test/resources/entities-with-classes.csv");
     // System.err.println(new File(entitiesFile).getAbsolutePath());
   }
 

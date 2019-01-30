@@ -1,22 +1,43 @@
 package de.gwdg.metadataqa.wikidata.json;
 
 import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
+import de.gwdg.metadataqa.wikidata.json.labelextractor.JenaBasedSparqlClient;
 import de.gwdg.metadataqa.wikidata.model.WikidataEntity;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ClassExtractor {
 
   private final String inputFileName;
   private Map<String, WikidataEntity> entities = new HashMap<>();
+  private final JenaBasedSparqlClient sparqlClient;
+  private int newEntitiesCount = 0;
+  private long duration = 0;
 
   public ClassExtractor(String inputFileName) {
     this.inputFileName = inputFileName;
     readCsv(inputFileName);
+    sparqlClient = new JenaBasedSparqlClient();
+  }
+
+  public void resolveAll() {
+    long start = System.currentTimeMillis();
+    for (WikidataEntity entity : entities.values()) {
+      if (entity.getClasses() == null || entity.getClasses().isEmpty()) {
+        entity.setClasses(sparqlClient.getClasses(entity.getId()));
+        System.err.println(entity.serializeClasses());
+        newEntitiesCount++;
+      }
+    }
+    duration += (System.currentTimeMillis() - start);
   }
 
   private void readCsv(String csvFile) {
@@ -26,13 +47,13 @@ public class ClassExtractor {
     try {
       reader = new CSVReader(new FileReader(csvFile));
       while ((line = reader.readNext()) != null) {
-        WikidataEntity entity = null;
-        if (line.length == 2) {
-          entity = new WikidataEntity(line[0], line[1]);
-        } else {
-          entity = new WikidataEntity(line[0], line[1]);
+        if (line[0].equals("id"))
+          continue;
+
+        WikidataEntity entity = new WikidataEntity(line[0], line[1]);
+        if (line.length == 3)
           entity.setClasses(entity.deserializeClasses(line[2]));
-        }
+
         entities.put(line[0], entity);
         lineNumber++;
       }
@@ -47,5 +68,49 @@ public class ClassExtractor {
     }
     System.err.println(lineNumber);
   }
+
+  public void saveEntities(String entitiesFile) {
+    if (newEntitiesCount == 0)
+      return;
+
+    System.err.printf(
+      "save entities: %d new/%d total (entities import took %d ms)\n",
+      newEntitiesCount,
+      entities.size(),
+      duration
+    );
+    duration = 0;
+    FileWriter writer = null;
+    try {
+      writer = new FileWriter(entitiesFile);
+      //using custom delimiter and quote character
+      CSVWriter csvWriter = new CSVWriter(writer);
+
+      List<String[]> data = entitiesToStringArray();
+
+      csvWriter.writeAll(data);
+      csvWriter.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private List<String[]> entitiesToStringArray() {
+    List<String[]> records = new ArrayList<String[]>();
+
+    // adding header record
+    records.add(new String[]{"id", "label", "classes"});
+
+    for (Map.Entry<String, WikidataEntity> entry : entities.entrySet()) {
+      records.add(new String[]{
+        entry.getKey(),
+        entry.getValue().getLabel(),
+        entry.getValue().serializeClasses()
+      });
+    }
+
+    return records;
+  }
+
 
 }

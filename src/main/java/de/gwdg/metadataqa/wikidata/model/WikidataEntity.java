@@ -35,6 +35,10 @@ public class WikidataEntity {
     return label;
   }
 
+  public Map<String, String> getClasses() {
+    return classes;
+  }
+
   public String serializeClasses() {
     List<String> entries = new ArrayList<>();
     for (Map.Entry<String, String> entry : classes.entrySet()) {

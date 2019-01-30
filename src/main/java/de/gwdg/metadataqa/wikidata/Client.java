@@ -5,7 +5,6 @@ import de.gwdg.metadataqa.wikidata.json.CliParameters;
 import de.gwdg.metadataqa.wikidata.json.Reader;
 import de.gwdg.metadataqa.wikidata.json.Utils;
 import org.apache.commons.cli.HelpFormatter;
-import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.nio.file.Files;
