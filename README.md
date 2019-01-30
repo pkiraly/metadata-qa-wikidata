@@ -27,3 +27,5 @@ Properties and entities files to be located in the `data/` directory (property-f
 # More details
 
 See [the wiki pages](https://github.com/pkiraly/metadata-qa-wikidata/wiki).
+
+[![Build Status](https://travis-ci.org/pkiraly/metadata-qa-wikidata.svg?branch=master)](https://travis-ci.org/pkiraly/metadata-qa-wikidata)
