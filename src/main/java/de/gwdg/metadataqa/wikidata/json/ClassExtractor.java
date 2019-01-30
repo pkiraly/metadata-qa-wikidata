@@ -33,11 +33,14 @@ public class ClassExtractor {
     for (WikidataEntity entity : entities.values()) {
       if (entity.getClasses() == null || entity.getClasses().isEmpty()) {
         entity.setClasses(sparqlClient.getClasses(entity.getId()));
-        System.err.println(entity.serializeClasses());
         newEntitiesCount++;
       }
     }
     duration += (System.currentTimeMillis() - start);
+  }
+
+  public Map<String, WikidataEntity> getEntities() {
+    return entities;
   }
 
   private void readCsv(String csvFile) {
