@@ -1,4 +1,4 @@
-package de.gwdg.metadataqa.wikidata.json;
+package de.gwdg.metadataqa.wikidata.model;
 
 public class WikidataProperty {
   String id;

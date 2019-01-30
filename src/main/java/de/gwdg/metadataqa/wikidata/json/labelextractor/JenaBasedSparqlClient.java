@@ -45,7 +45,7 @@ public class JenaBasedSparqlClient implements LabelExtractor {
     System.err.println(label);
   }
 
-  public Map<String, String> getClassess(String entityId) {
+  public Map<String, String> getClasses(String entityId) {
     Map<String, String> classes = new HashMap<>();
 
     Query query = QueryFactory.create(String.format(CLASS_QUERY_PATTERN, entityId));

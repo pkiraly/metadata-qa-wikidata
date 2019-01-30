@@ -4,6 +4,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import de.gwdg.metadataqa.wikidata.json.labelextractor.JenaBasedSparqlClient;
 import de.gwdg.metadataqa.wikidata.json.labelextractor.WdClient;
+import de.gwdg.metadataqa.wikidata.model.WikidataProperty;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -38,7 +39,7 @@ public class Reader {
   private final String propertiesFile;
   private final String entitiesFile;
 
-  private enum TYPE {
+  public enum TYPE {
     PROPERTIES,
     ENTITIES;
   }
