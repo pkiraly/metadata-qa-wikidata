@@ -12,4 +12,4 @@ buildNumber.properties
 .idea
 
 # to be created from data sources
-data/
+data/*.json
