@@ -14,13 +14,25 @@ mvn clean install
 
 ### run it
 
-```
+Run the transformation from encoded JSON dump to "human readable" JSON
+
+```{bash}
 java -cp target/wikidata-0.1-SNAPSHOT.jar de.gwdg.metadataqa.wikidata.Client \
   --input-file data/wikidata-[version]-publications.ndjson \
   --output-file data/transformed.json \
   --property-file data/properties-12M.csv \
   --entity-file data/entities-12M.csv
+  --command TRANSFORMATION
 ```
+
+Run the entity class resolution
+
+```
+java -cp target/wikidata-0.1-SNAPSHOT.jar de.gwdg.metadataqa.wikidata.Client \
+  --entity-file data/entities-12M.csv \
+  --command ENTITY_CLASS_RESOLUTION
+```
+
 
 Properties and entities files to be located in the `data/` directory (property-file, entity-file parameters) will be provided in the project in the future.
 
