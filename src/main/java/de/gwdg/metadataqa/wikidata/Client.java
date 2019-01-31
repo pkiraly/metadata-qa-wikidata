@@ -3,6 +3,7 @@ package de.gwdg.metadataqa.wikidata;
 import de.gwdg.metadataqa.wikidata.json.BreakException;
 import de.gwdg.metadataqa.wikidata.json.ClassExtractor;
 import de.gwdg.metadataqa.wikidata.json.CliParameters;
+import de.gwdg.metadataqa.wikidata.json.MultithreadClassExtractor;
 import de.gwdg.metadataqa.wikidata.json.Reader;
 import de.gwdg.metadataqa.wikidata.json.Utils;
 import org.apache.commons.cli.HelpFormatter;
@@ -44,6 +45,8 @@ public class Client {
     if (command != null) {
       if (command.equals(Command.ENTITY_CLASS_RESOLUTION)) {
         resolveEntityClasses(entitiesFile);
+      } else if (command.equals(Command.ENTITY_CLASS_RESOLUTION_MULTITHREAD)) {
+        resolveEntityClassesWithMultithread(entitiesFile);
       } else if (command.equals(Command.ENTITY_RESOLUTION)) {
         resolveEntities(parameters, propertiesFile, entitiesFile, input, command, processingLimit);
       } else if (command.equals(Command.TRANSFORMATION)) {
@@ -92,6 +95,12 @@ public class Client {
 
   private static void resolveEntityClasses(String entitiesFile) {
     ClassExtractor extractor = new ClassExtractor(entitiesFile);
+    extractor.resolveAll();
+    extractor.saveEntities(entitiesFile);
+  }
+
+  private static void resolveEntityClassesWithMultithread(String entitiesFile) {
+    MultithreadClassExtractor extractor = new MultithreadClassExtractor(entitiesFile, 10);
     extractor.resolveAll();
     extractor.saveEntities(entitiesFile);
   }
