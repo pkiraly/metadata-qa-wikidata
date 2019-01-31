@@ -12,7 +12,7 @@ public class UniqFormatEntryTest {
   public void testProperInput() {
     UniqFormatEntry entry = new UniqFormatEntry("      1 1008.e11-2");
     assertEquals(1, entry.getCount());
-    assertEquals("1008.e11-2", entry.getPages());
+    assertEquals("1008.e11-2", entry.getPageNumbers());
   }
 
   @Test(expected = InvalidParameterException.class)

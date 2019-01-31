@@ -1,6 +1,7 @@
 package de.gwdg.metadataqa.wikidata.json;
 
 import com.sun.media.sound.InvalidDataException;
+import de.gwdg.metadataqa.wikidata.model.PageNumberErrorType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,19 +23,20 @@ public class PageValidatorTest {
     validator = new PageValidator();
   }
 
-  @Test(expected = InvalidDataException.class)
-  public void testInvalidValue() throws InvalidDataException {
+  @Test(expected = InvalidPageNumberException.class)
+  public void testInvalidValue() throws InvalidPageNumberException {
     validator.validateUniqFormatEntry("      1 1008.e11-2");
   }
 
   @Test
-  public void testExtractor() throws InvalidDataException {
+  public void testExtractor() throws InvalidPageNumberException {
     validator.validateUniqFormatEntry("      1 10093-10096");
   }
 
   @Test
-  public void testAll() throws InvalidDataException {
-    Map<String, Integer> counter = new HashMap<>();
+  public void testAll() throws InvalidPageNumberException {
+    Map<PageNumberErrorType, Integer> counter = new HashMap<>();
+    Map<String, Integer> patternCounter = new HashMap<>();
 
     Stream<String> lines = null;
     try {
@@ -46,15 +48,19 @@ public class PageValidatorTest {
             validCounter++;
           else
             invalidCounter++;
-        } catch (InvalidDataException e) {
+        } catch (InvalidPageNumberException e) {
           invalidCounter++;
           // System.err.println(e.getMessage());
-          if (!counter.containsKey(e.getMessage())) {
-            counter.put(e.getMessage(), 0);
+          if (!counter.containsKey(e.getType())) {
+            counter.put(e.getType(), 0);
           }
-          counter.put(e.getMessage(), counter.get(e.getMessage()) + 1);
-          if (e.getMessage().equals("NOT_NUMBERS")) {
-            // System.err.println(line);
+          counter.put(e.getType(), counter.get(e.getType()) + 1);
+          if (e.getType().equals(PageNumberErrorType.NOT_NUMBERS)) {
+            String key = e.getShortened();
+            if (!patternCounter.containsKey(key)) {
+              patternCounter.put(key, 0);
+            }
+            patternCounter.put(key, patternCounter.get(key) + 1);
           }
           // e.printStackTrace();
         }
@@ -68,6 +74,9 @@ public class PageValidatorTest {
     }
     System.out.printf("valid: %d, invalid: %d%n", validCounter, invalidCounter);
     for (Map.Entry entry : counter.entrySet()) {
+      System.out.printf("%s: %d%n", entry.getKey(), entry.getValue());
+    }
+    for (Map.Entry entry : patternCounter.entrySet()) {
       System.out.printf("%s: %d%n", entry.getKey(), entry.getValue());
     }
   }

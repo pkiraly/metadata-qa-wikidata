@@ -10,13 +10,13 @@ public class UniqFormatEntry {
 
   private String line;
   private int count;
-  private String pages;
+  private String pageNumbers;
 
   public UniqFormatEntry(String line) throws InvalidParameterException {
     Matcher matcher = LINE_PATTERN.matcher(line);
     if (matcher.matches()) {
       count = Integer.parseInt(matcher.group(1));
-      pages = matcher.group(2);
+      pageNumbers = matcher.group(2);
     } else {
       throw new InvalidParameterException("Line doesn't match the pattern: " + line);
     }
@@ -30,7 +30,7 @@ public class UniqFormatEntry {
     return count;
   }
 
-  public String getPages() {
-    return pages;
+  public String getPageNumbers() {
+    return pageNumbers;
   }
 }
