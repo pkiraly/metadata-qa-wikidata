@@ -4,7 +4,9 @@ import de.gwdg.metadataqa.wikidata.json.labelextractor.JenaBasedSparqlClient;
 import de.gwdg.metadataqa.wikidata.model.WikidataEntity;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -46,4 +48,30 @@ public class ClassExtractorTest {
     }
   }
 
+  @Test
+  public void readingCVSWithClasses_doesntRecalculateThem() {
+    String entitiesFile = "src/test/resources/entities.csv";
+    String outputFile = "src/test/resources/entities-with-classes.csv";
+
+    ClassExtractor extractor = new ClassExtractor(entitiesFile);
+    extractor.resolveAll();
+    extractor.saveEntities(outputFile);
+
+    File versionBefore = new File(outputFile);
+    long lengthOfVersionBefore = versionBefore.length();
+    long modifiedOfVersionBefore = versionBefore.lastModified();
+    System.err.println(new Date(modifiedOfVersionBefore));
+
+    extractor = new ClassExtractor(outputFile);
+    extractor.resolveAll();
+    extractor.saveEntities(outputFile);
+
+    File versionAfter = new File(outputFile);
+    long lengthOfVersionAfter = versionAfter.length();
+    long modifiedTimeOfVersionAfter = versionAfter.lastModified();
+
+    assertEquals(lengthOfVersionBefore, lengthOfVersionAfter);
+    assertEquals(modifiedOfVersionBefore, modifiedTimeOfVersionAfter);
+    System.err.println(new Date(modifiedTimeOfVersionAfter));
+  }
 }

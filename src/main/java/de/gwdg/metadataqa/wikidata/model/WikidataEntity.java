@@ -8,10 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 public class WikidataEntity {
-  String id;
-  String type;
-  String label;
-  Map<String, String> classes;
+  private String id;
+  private String type;
+  private String label;
+  private Map<String, String> classes;
+  private String serializedClasses;
 
   public WikidataEntity(String id, String label) {
     this.id = id;
@@ -40,18 +41,29 @@ public class WikidataEntity {
   }
 
   public String serializeClasses() {
-    List<String> entries = new ArrayList<>();
-    for (Map.Entry<String, String> entry : classes.entrySet()) {
-      entries.add(String.format("%s:%s", entry.getKey(), entry.getValue()));
+    if (serializedClasses == null) {
+      List<String> entries = new ArrayList<>();
+      if (classes != null) {
+        for (Map.Entry<String, String> entry : classes.entrySet()) {
+          entries.add(String.format("%s:%s", entry.getKey(), entry.getValue()));
+        }
+      }
+      serializedClasses = StringUtils.join(entries, "|");
     }
-    return StringUtils.join(entries, "|");
+    return serializedClasses;
   }
 
   public Map<String, String> deserializeClasses(String serializedClasses) {
     Map<String, String> entries = new HashMap<>();
-    for (String entry : serializedClasses.split("\\|")) {
-      String[] parts = entry.split(":", 2);
-      entries.put(parts[0], parts[1]);
+    if (StringUtils.isNotBlank(serializedClasses)) {
+      for (String entry : serializedClasses.split("\\|")) {
+        String[] parts = entry.split(":", 2);
+        if (parts.length == 2) {
+          entries.put(parts[0], parts[1]);
+        } else {
+          System.err.println("Error: " + entry);
+        }
+      }
     }
     return entries;
   }

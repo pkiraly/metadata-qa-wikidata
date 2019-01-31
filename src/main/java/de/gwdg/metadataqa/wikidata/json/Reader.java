@@ -2,6 +2,7 @@ package de.gwdg.metadataqa.wikidata.json;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
+import de.gwdg.metadataqa.wikidata.Command;
 import de.gwdg.metadataqa.wikidata.json.labelextractor.JenaBasedSparqlClient;
 import de.gwdg.metadataqa.wikidata.json.labelextractor.WdClient;
 import de.gwdg.metadataqa.wikidata.model.WikidataProperty;
@@ -54,10 +55,11 @@ public class Reader {
   // private JenaBasedSparqlClient sparqlClient = new JenaBasedSparqlClient();
   private LabelExtractor extractor;
   private long duration = 0;
-  private String command = "transformation";
+  private Command command;
   private PrintWriter out = null;
 
-  public Reader(String propertiesFile, String entitiesFile) {
+  public Reader(Command command, String propertiesFile, String entitiesFile) {
+    this.command = command;
     this.propertiesFile = propertiesFile;
     this.entitiesFile = entitiesFile;
     readCsv(propertiesFile, TYPE.PROPERTIES);
@@ -76,10 +78,10 @@ public class Reader {
     try {
       Object obj = parser.parse(jsonString);
       JSONObject input = (JSONObject) obj;
-      if (command.equals("transformation")) {
+      if (command.equals(Command.TRANSFORMATION)) {
         JSONObject output = process(true, input);
         out.println(output.toJSONString());
-      } else {
+      } else if (command.equals(Command.ENTITY_RESOLUTION)) {
         JSONObject output = process(new ArrayList<>(), input);
       }
     } catch (ParseException e) {

@@ -1,5 +1,6 @@
 package de.gwdg.metadataqa.wikidata.json;
 
+import de.gwdg.metadataqa.wikidata.Command;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -9,12 +10,6 @@ import org.apache.commons.cli.ParseException;
 public class CliParameters {
   protected static Options options = new Options();
   protected static final CommandLineParser parser = new DefaultParser();
-
-  public enum Command {
-    TRANSFORMATION,
-    READ,
-    ENTITY_RESOLUTION;
-  }
 
   static {
     options.addOption("i", "input-file", true, "input JSON dump");

@@ -21,6 +21,7 @@ public class ClassExtractor {
   private final JenaBasedSparqlClient sparqlClient;
   private int newEntitiesCount = 0;
   private long duration = 0;
+  private int autoSaveTreshold = 1000;
 
   public ClassExtractor(String inputFileName) {
     this.inputFileName = inputFileName;
@@ -30,10 +31,19 @@ public class ClassExtractor {
 
   public void resolveAll() {
     long start = System.currentTimeMillis();
+    long startSaving = 0;
     for (WikidataEntity entity : entities.values()) {
       if (entity.getClasses() == null || entity.getClasses().isEmpty()) {
         entity.setClasses(sparqlClient.getClasses(entity.getId()));
         newEntitiesCount++;
+      }
+
+      if (autoSaveTreshold != 0
+        && newEntitiesCount > 0
+        && newEntitiesCount % autoSaveTreshold == 0) {
+        startSaving = System.currentTimeMillis();
+        saveEntities(inputFileName);
+        System.err.printf("saved so far %d records, took %d ms%n", newEntitiesCount, (System.currentTimeMillis() - startSaving));
       }
     }
     duration += (System.currentTimeMillis() - start);
