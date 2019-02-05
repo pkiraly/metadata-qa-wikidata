@@ -1,0 +1,58 @@
+[
+    {
+        "DOI": "10.3233/SW-150175",
+        "author": [
+            {
+                "_ordinal": 1,
+                "family": "Zaveri",
+                "given": "Amrapali"
+            },
+            {
+                "_ordinal": 2,
+                "family": "Rula",
+                "given": "Anisa"
+            },
+            {
+                "_ordinal": 3,
+                "family": "Maurino",
+                "given": "Andrea"
+            },
+            {
+                "_ordinal": 4,
+                "family": "Pietrobon",
+                "given": "Ricardo"
+            },
+            {
+                "_ordinal": 4,
+                "family": "Pietrobon",
+                "given": "Ricardo"
+            },
+            {
+                "_ordinal": 5,
+                "family": "Lehmann",
+                "given": "Jens"
+            },
+            {
+                "_ordinal": 6,
+                "family": "Auer",
+                "given": "Sören"
+            }
+        ],
+        "container-title": "Semantic Web: interoperability, usability, applicability",
+        "id": "Q47543579",
+        "issue": "1",
+        "issued": {
+            "date-parts": [
+                [
+                    2015,
+                    3,
+                    17
+                ]
+            ]
+        },
+        "page": "63-93",
+        "title": "Quality assessment for Linked Data: A Survey",
+        "type": "article-journal",
+        "volume": "7"
+    }
+]

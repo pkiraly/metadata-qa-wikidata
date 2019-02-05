@@ -1,5 +1,5 @@
-# get all properties used to identify works (ISSN, IMDb ID, LCCN...)
+# get all properties used for authority control (ISSN, IMDb ID, LCCN, GND...)
 SELECT ?prop ?label WHERE {
-  ?prop wdt:P31/wdt:P279* wd:Q19833377 .
+  ?prop wdt:P31/wdt:P279* wd:Q18614948 .
   ?prop rdfs:label ?label . FILTER(LANG(?label)="en")
 }
