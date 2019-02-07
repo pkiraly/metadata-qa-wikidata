@@ -6,6 +6,8 @@ Researchers (in alphabetic order): Péter Király and Jakob Voß
 
 ## usage
 
+The large files are stored on Github's Large File Storage. In order to work with them, install git-lfs: https://git-lfs.github.com/.
+
 ### build the code:
 
 ```
@@ -13,6 +15,17 @@ mvn clean install
 ```
 
 ### run it
+
+Resolve entities. It updates the entity file provided by `--entity-file` parameter.
+
+```{bash}
+java -cp target/wikidata-0.1-SNAPSHOT.jar de.gwdg.metadataqa.wikidata.Client \
+  --input-file data/wikidata/wikidata-[version]-publications.ndjson \
+  --entity-file data/entities-12M.csv \
+  --property-file data/properties-12M.csv \
+  --output-file test \
+  --command ENTITY_RESOLUTION
+```
 
 Run the transformation from encoded JSON dump to "human readable" JSON
 
