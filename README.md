@@ -6,6 +6,8 @@ Researchers (in alphabetic order): Péter Király and Jakob Voß
 
 ## usage
 
+The large files are stored on Github's Large File Storage. In order to work with them, install git-lfs: https://git-lfs.github.com/.
+
 ### build the code:
 
 ```
