@@ -3,6 +3,8 @@ package de.gwdg.metadataqa.wikidata;
 import de.gwdg.metadataqa.wikidata.json.BreakException;
 import de.gwdg.metadataqa.wikidata.json.ClassExtractor;
 import de.gwdg.metadataqa.wikidata.json.CliParameters;
+import de.gwdg.metadataqa.wikidata.json.EntityResolver;
+import de.gwdg.metadataqa.wikidata.json.JsonTransformer;
 import de.gwdg.metadataqa.wikidata.json.MultithreadClassExtractor;
 import de.gwdg.metadataqa.wikidata.json.Reader;
 import de.gwdg.metadataqa.wikidata.json.Utils;
@@ -67,7 +69,12 @@ public class Client {
                                       String input,
                                       Command command,
                                       int processingLimit) {
-    Reader reader = new Reader(command, propertiesFile, entitiesFile);
+    final Reader reader = command.equals(Command.ENTITY_RESOLUTION)
+      ? new EntityResolver(command, propertiesFile, entitiesFile)
+      : (command.equals(Command.TRANSFORMATION)
+        ? new JsonTransformer(command, propertiesFile, entitiesFile)
+        : null
+      );
     reader.setOutputFileName(parameters.getOutputFile());
 
     Stream<String> lines = null;
@@ -75,7 +82,8 @@ public class Client {
       lines = Files.lines(Paths.get(input));
       lines.forEach(item -> {
         reader.read(item);
-        if (processingLimit != 0 && reader.getRecordCounter() == processingLimit)
+        if (processingLimit != 0
+          && reader.getRecordCounter() == processingLimit)
           throw new BreakException();
       });
     } catch (IOException e) {

@@ -1,21 +1,18 @@
 package de.gwdg.metadataqa.wikidata.json;
 
-import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import de.gwdg.metadataqa.wikidata.Command;
 import de.gwdg.metadataqa.wikidata.json.labelextractor.JenaBasedSparqlClient;
 import de.gwdg.metadataqa.wikidata.json.labelextractor.WdClient;
-import de.gwdg.metadataqa.wikidata.model.WikidataProperty;
+import de.gwdg.metadataqa.wikidata.model.Wikidata;
+import de.gwdg.metadataqa.wikidata.model.WikidataEntity;
+import de.gwdg.metadataqa.wikidata.model.WikidataType;
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,15 +21,14 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-public class Reader {
+public abstract class Reader {
+
   private static final Pattern ENTITY_ID_PATTERN = Pattern.compile("^Q\\d+$");
   private static final String API_URL_PATTERN =
     "https://www.wikidata.org/wiki/Special:EntityData/%s.json";
@@ -40,185 +36,41 @@ public class Reader {
   private final String propertiesFile;
   private final String entitiesFile;
 
-  public enum TYPE {
-    PROPERTIES,
-    ENTITIES;
-  }
-
-  private static int recordCounter = 0;
+  protected static int recordCounter = 0;
   private static Map<String, Integer> container = new HashMap<>();
-  private static JSONParser parser = new JSONParser();
-  private Map<String, WikidataProperty> properties = new HashMap<>();
-  private Map<String, String> entities = new HashMap<>();
-  private int newEntitiesCount = 0;
-  private static List<String> printableTypes = Arrays.asList("String", "Long", "Double");
+  protected static JSONParser parser = new JSONParser();
+  protected Map<String, Wikidata> properties = new HashMap<>();
+  protected Map<String, Wikidata> entities = new HashMap<>();
+  protected int newEntitiesCount = 0;
   // private JenaBasedSparqlClient sparqlClient = new JenaBasedSparqlClient();
-  private LabelExtractor extractor;
+  protected LabelExtractor extractor;
   private long duration = 0;
-  private Command command;
-  private PrintWriter out = null;
+
+  protected Command command;
+  protected PrintWriter out = null;
+  private CsvManager csvManager = new CsvManager();
 
   public Reader(Command command, String propertiesFile, String entitiesFile) {
     this.command = command;
     this.propertiesFile = propertiesFile;
     this.entitiesFile = entitiesFile;
-    readCsv(propertiesFile, TYPE.PROPERTIES);
+    properties = csvManager.readCsv(propertiesFile, WikidataType.PROPERTIES);
     System.err.println("properties: " + properties.size());
-    readCsv(entitiesFile, TYPE.ENTITIES);
+    entities = csvManager.readCsv(entitiesFile, WikidataType.ENTITIES);
     System.err.println("entities: " + entities.size());
     extractor = new WdClient();
     // extractor = new JenaBasedSparqlClient();
   }
 
-  public void read(String jsonString) {
-    recordCounter++;
+  abstract public void read(String jsonString);
 
-    if (recordCounter % 100000 == 0)
-      System.err.println(recordCounter);
-    try {
-      Object obj = parser.parse(jsonString);
-      JSONObject input = (JSONObject) obj;
-      if (command.equals(Command.TRANSFORMATION)) {
-        JSONObject output = process(true, input);
-        out.println(output.toJSONString());
-      } else if (command.equals(Command.ENTITY_RESOLUTION)) {
-        JSONObject output = process(new ArrayList<>(), input);
-      }
-    } catch (ParseException e) {
-      e.printStackTrace();
-    }
-
-    if (newEntitiesCount >= 100) {
-      System.err.println("newEntitiesCount: " + newEntitiesCount);
-      saveEntities();
-      newEntitiesCount = 0;
-    }
-  }
-
-  private JSONObject process(List<String> path, JSONObject jsonObject) {
-    JSONObject record = new JSONObject();
-    for (Object keyObj : jsonObject.keySet()) {
-      String key = (String) keyObj;
-      Object value = jsonObject.get(keyObj);
-      String type = value.getClass().getSimpleName();
-      String resolvedPath = null;
-      if (path.contains("claims")) {// && printableTypes.contains(type)) {
-        resolvedPath = resolvePath(path);
-        if (printableTypes.contains(type)) {
-          final String resolvedValue = resolveValue(value.toString());
-          record.put(resolvedPath, resolvedValue);
-          // System.err.printf("O: %s/%s: %s\n", resolvedPath, key, resolvedValue);
-        }
-      }
-
-      if (type.equals("String")) {
-        addContainer(path, key, "String");
-      } else if (type.equals("Long")) {
-        addContainer(path, key, "Long");
-      } else if (type.equals("Double")) {
-        addContainer(path, key, "Double");
-      } else if (type.equals("JSONArray")) {
-        process(buildPath(path, key), (JSONArray)value);
-      } else if (type.equals("JSONObject")) {
-        process(buildPath(path, key), (JSONObject)value);
-      } else {
-        System.err.println("unknown type [in object]: " + type);
-      }
-    }
-    return record;
-  }
-
-  private JSONObject process(boolean isRoot, JSONObject input) {
-    JSONObject record = new JSONObject();
-    for (Object keyObj : input.keySet()) {
-      String key = (String) keyObj;
-      Object value = input.get(keyObj);
-      String type = value.getClass().getSimpleName();
-      boolean processChild = !isRoot || key.equals("claims");
-      String resolvedProperty = resolveProperty(key);
-      // System.err.printf("%s - is root: %s, processChild: %s%n", key, isRoot, processChild);
-
-      if (processChild) {
-        if (type.equals("String")) {
-          record.put(resolvedProperty, resolveValue((String)value));
-        } else if (type.equals("Long")) {
-          record.put(resolvedProperty, value);
-        } else if (type.equals("Double")) {
-          record.put(resolvedProperty, value);
-        } else if (type.equals("JSONArray")) {
-          record.put(resolvedProperty, process((JSONArray)value));
-        } else if (type.equals("JSONObject")) {
-          record.put(resolvedProperty, process(false, (JSONObject)value));
-        } else {
-          System.err.println("unknown type [in object]: " + type);
-        }
-      }
-    }
-    return record;
-  }
-
-  private String resolveProperty(String propertyId) {
+  protected String resolveProperty(String propertyId) {
     if (properties.containsKey(propertyId))
       return properties.get(propertyId).getLabel();
     return propertyId;
   }
 
-  private JSONArray process(JSONArray jsonArray) {
-    JSONArray output = new JSONArray();
-    Iterator it = jsonArray.iterator();
-    int i = 0;
-    if (it.hasNext()) {
-      Object item = it.next();
-      String type = item.getClass().getSimpleName();
-
-      if (type.equals("String")) {
-        output.add(resolveValue((String)item));
-      } else if (type.equals("Long")) {
-        output.add(item);
-      } else if (type.equals("Double")) {
-        output.add(item);
-      } else if (type.equals("JSONArray")) {
-        output.add(process((JSONArray)item));
-      } else if (type.equals("JSONObject")) {
-        output.add(process(true, (JSONObject)item));
-      } else {
-        System.err.println("unknown type [array]: " + type);
-      }
-      i++;
-    }
-    return output;
-  }
-
-  private void process(List<String> path, JSONArray jsonArray) {
-    Iterator it = jsonArray.iterator();
-    int i = 0;
-    if (it.hasNext()) {
-      Object item = it.next();
-      String type = item.getClass().getSimpleName();
-      if (path.contains("claims") && printableTypes.contains(type)) {
-        final String resolvedPath = resolvePath(path);
-        // final String resolvedValue = resolveValue(item);
-        // System.err.printf("A: %s/%s: %s\n", resolvedPath, i, resolvedValue);
-      }
-
-      if (type.equals("String")) {
-        addContainer(path, "0", "String");
-      } else if (type.equals("Long")) {
-        addContainer(path, "0", "Long");
-      } else if (type.equals("Double")) {
-        addContainer(path, "0", "Double");
-      } else if (type.equals("JSONArray")) {
-        process(buildPath(path, String.valueOf(i)), (JSONArray)item);
-      } else if (type.equals("JSONObject")) {
-        process(buildPath(path, String.valueOf(i)), (JSONObject)item);
-      } else {
-        System.err.println("unknown type [array]: " + type);
-      }
-      i++;
-    }
-  }
-
-  private String resolveValue(String value) {
+  protected String resolveValue(String value) {
     String resolvedValue = value;
     if (value instanceof String) {
       long start = System.currentTimeMillis();
@@ -230,38 +82,31 @@ public class Reader {
             String label = extractor.getLabel(entityId);
             // String label = readWd(entityId);
             newEntitiesCount++;
-            entities.put(entityId, label);
-            resolvedValue = entities.get(entityId);
+            entities.put(entityId, new WikidataEntity(entityId, label));
+            resolvedValue = entities.get(entityId).getLabel();
           } else if (extractor instanceof WdClient) {
             extractor.addOnHold(entityId);
             Set<String> onHold = extractor.getOnHold();
             if (onHold.size() >= 20) {
               Map<String, String> labels = extractor.getLabels(new ArrayList<>(onHold));
-              // System.err.println("trigger: " + entityId);
-              // System.err.println("on hold: " + StringUtils.join(extractor.getOnHold(), ", "));
-              // System.err.println("labels: " + StringUtils.join(labels.keySet(), ", "));
               for (Map.Entry<String, String> label : labels.entrySet()) {
                 if (label.equals(entityId)) {
                   System.err.println("THIS IS THE TRIGGER");
                 }
                 if (!entities.containsKey(label.getKey())) {
-                  entities.put(label.getKey(), label.getValue());
+                  entities.put(label.getKey(), new WikidataEntity(label.getKey(), label.getValue()));
                 } else {
                   System.err.printf("already there %s: '%s' vs '%s'%n",
                     label.getKey(), label.getValue(), entities.get(label.getKey()));
                 }
               }
               newEntitiesCount += labels.size();
-              System.err.printf(
-                "<-extractor.getLabels() %d new / %d total%n",
-                newEntitiesCount, entities.size()
-              );
               extractor.clearOnHold();
-              resolvedValue = entities.get(entityId);
+              resolvedValue = entities.get(entityId).getLabel();
             }
           }
         } else {
-          resolvedValue = entities.get(entityId);
+          resolvedValue = entities.get(entityId).getLabel();
         }
       }
       duration += (System.currentTimeMillis() - start);
@@ -269,14 +114,14 @@ public class Reader {
     return resolvedValue;
   }
 
-  private static List<String> buildPath(List<String> path, String key) {
+  protected static List<String> buildPath(List<String> path, String key) {
     List<String> path2 = new ArrayList<>(path);
     path2.add(key);
     return path2;
     // return path.equals("/") ? "/" + key : String.format("%s/%s", path, key);
   }
 
-  private static void addContainer(List<String> path, String key, String type) {
+  protected static void addContainer(List<String> path, String key, String type) {
     key = StringUtils.join("/", path) + "/" + key;
     String typedKey = String.format("%s (%s)", key, type);
     if (!container.containsKey(typedKey)) {
@@ -293,34 +138,7 @@ public class Reader {
     return container;
   }
 
-  private void readCsv(String csvFile, TYPE type) {
-    CSVReader reader = null;
-    int lineNumber = 0;
-    String[] line = null;
-    try {
-      reader = new CSVReader(new FileReader(csvFile));
-      while ((line = reader.readNext()) != null) {
-        if (type.equals(TYPE.PROPERTIES)) {
-          WikidataProperty property = new WikidataProperty(line[0], line[1], line[3]);
-          properties.put(property.getId(), property);
-        } else if (type.equals(TYPE.ENTITIES)) {
-          entities.put(line[0], line[1]);
-        }
-        lineNumber++;
-      }
-    } catch (IOException e) {
-      System.err.println("line number: " + lineNumber);
-      System.err.println("last good line: " + StringUtils.join(line, " // "));
-      e.printStackTrace();
-      throw new IllegalArgumentException("Wrong CSV file: " + csvFile);
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new IllegalArgumentException("Wrong CSV file: " + csvFile);
-    }
-    System.err.println(type.name() + " " + lineNumber);
-  }
-
-  private String resolvePath(List<String> path) {
+  protected String resolvePath(List<String> path) {
     String propertyId = path.get(path.size() - 1);
     String label;
     if (propertyId.startsWith("P")) {
@@ -374,9 +192,13 @@ public class Reader {
     if (extractor instanceof WdClient) {
       Set<String> onHold = ((WdClient) extractor).getOnHold();
       if (onHold.size() > 0) {
-        Map<String, String> labels = extractor.getLabels(new ArrayList<>(onHold));
-        entities.putAll(labels);
-        newEntitiesCount += labels.size();
+        int i = 0;
+        for (Map.Entry<String, String> label : extractor.getLabels(new ArrayList<>(onHold)).entrySet()) {
+          entities.put(label.getKey(),
+            new WikidataEntity(label.getKey(), label.getValue()));
+          i++;
+        }
+        newEntitiesCount += i;
         ((WdClient) extractor).clearOnHold();
       }
     }
@@ -415,8 +237,8 @@ public class Reader {
     // adding header record
     records.add(new String[]{"id", "label"});
 
-    for (Map.Entry<String, String> entry : entities.entrySet()) {
-      records.add(new String[]{entry.getKey(), entry.getValue()});
+    for (Map.Entry<String, Wikidata> entry : entities.entrySet()) {
+      records.add(new String[]{entry.getKey(), entry.getValue().getLabel()});
     }
 
     return records;

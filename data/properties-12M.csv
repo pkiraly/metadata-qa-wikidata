@@ -1,0 +1,948 @@
+P31,String,12442883,instance of
+P1476,String,11651775,title
+P1433,String,11623690,published in
+P577,String,11501951,publication date
+P2093,String,11228475,author name string
+P698,String,11128260,PubMed ID
+P304,String,11064568,page(s)
+P478,String,11040799,volume
+P433,String,9853182,issue
+P356,String,8637062,DOI
+P932,String,3712297,PMCID
+P2860,String,1732422,cites
+P407,String,1078080,language of work or name
+P50,String,937838,author
+P921,String,776151,main subject
+P495,String,335396,country of origin
+P3181,String,245879,OpenCitations bibliographic resource ID
+P175,String,232377,performer
+P155,String,173499,follows
+P156,String,170333,followed by
+P136,String,151665,genre
+P264,String,130636,record label
+P361,String,126146,part of
+P436,String,89961,MusicBrainz release group ID
+P2880,String,55782,NIOSHTIC-2 ID
+P859,String,55572,sponsor
+P236,String,51929,ISSN
+P123,String,47927,publisher
+P1954,String,40895,Discogs master ID
+P646,String,40822,Freebase ID
+P571,String,35736,inception
+P856,String,33231,official website
+P1055,String,31071,NLM Unique ID
+P243,String,28528,OCLC control number
+P212,String,27246,ISBN-13
+P3903,String,25519,column
+P1058,String,22479,ERA Journal ID
+P1729,String,21846,AllMusic album ID
+P162,String,19817,producer
+P957,String,18895,ISBN-10
+P2624,String,17651,MetroLyrics ID
+P2007,String,14260,ZooBank publication ID
+P1250,String,13742,Danish Bibliometric Research Indicator (BFI) SNO/CNO
+P1240,String,13741,Danish Bibliometric Research Indicator level
+P1156,String,12650,Scopus Source ID
+P17,String,11784,country
+P435,String,10913,MusicBrainz work ID
+P179,String,10531,series
+P888,String,10407,JSTOR article ID
+P291,String,10017,place of publication
+P953,String,9324,full work available at
+P1651,String,9268,YouTube video ID
+P1104,Long,8797,number of pages
+P18,String,8623,image
+P585,String,5715,point in time
+P676,String,5625,lyrics by
+P706,String,5528,located on terrain feature
+P3417,String,5349,Quora topic ID
+P629,String,4905,edition or translation of
+P373,String,4690,Commons category
+P840,String,4517,narrative location
+P2206,String,4263,Discogs release ID
+P576,String,4254,"dissolved, abolished or demolished"
+P98,String,4160,editor
+P2581,String,4119,BabelNet ID
+P86,String,3802,composer
+P3912,String,3709,newspaper format
+P1160,String,3682,ISO 4 abbreviation
+P127,String,3382,owned by
+P268,String,3309,BnF ID
+P1889,String,3298,different from
+P1680,String,3221,subtitle
+P1417,String,3066,Encyclopædia Britannica Online ID
+P2721,String,2996,Encyclopaedia Metallum release ID
+P4222,String,2931,United Nations Treaty Series Volume Number
+P996,String,2757,scanned file on Wikimedia Commons
+P1230,String,2501,JSTOR journal code
+P687,String,2423,BHL Page ID
+P110,String,2407,illustrator
+P1144,String,2398,Library of Congress Control Number (LCCN) (bibliographic)
+P736,String,2365,cover artist
+P1609,String,2032,Dialnet journal
+P159,String,2024,headquarters location
+P655,String,2009,translator
+P4616,String,2001,UniProt journal ID
+P214,String,1943,VIAF ID
+P166,String,1861,award received
+P3959,String,1797,NNL work ID
+P674,String,1728,characters
+P154,String,1647,logo image
+P227,String,1563,GND ID
+P1042,String,1443,ZDB ID
+P648,String,1325,Open Library ID
+P1159,String,1324,CODEN
+P910,String,1283,topic's main category
+P112,String,1235,founded by
+P747,String,1235,has edition
+P2002,String,1164,Twitter username
+P580,String,1133,start time
+P2034,String,1071,Project Gutenberg ebook ID
+P582,String,1070,end time
+P675,String,1062,Google Books ID
+P1274,String,1056,ISFDB title ID
+P393,String,1003,edition number
+P1343,String,983,described by source
+P483,String,892,recorded at
+P1957,String,874,Wikisource index page
+P1260,String,862,Cultural heritage database in Sweden ID
+P248,String,793,stated in
+P1712,String,788,Metacritic ID
+P170,String,778,creator
+P724,String,744,Internet Archive ID
+P973,String,743,described at URL
+P275,String,730,license
+P950,String,724,BNE ID
+P244,String,697,Library of Congress authority ID
+P2013,String,692,Facebook ID
+P527,String,667,has part
+P1827,String,627,ISWC
+P195,String,627,collection
+P57,String,624,director
+P345,String,613,IMDb ID
+P658,String,545,tracklist
+P276,String,540,location
+P1814,String,530,name in kana
+P269,String,522,SUDOC authorities ID
+P1411,String,520,nominated for
+P1922,String,516,first line
+P1036,String,497,Dewey Decimal Classification
+P137,String,492,operator
+P101,String,474,field of work
+P424,String,473,Wikimedia language code
+P1800,String,471,Wikimedia database name
+P131,String,468,located in the administrative territorial entity
+P138,String,460,named after
+P217,String,453,inventory number
+P2047,Long,441,duration
+P2669,String,432,discontinued date
+P2008,String,415,IPNI publication ID
+P1065,String,412,archive URL
+P767,String,409,contributor(s) to the creative work
+P2283,String,408,uses
+P180,String,400,depicts
+P818,String,385,arXiv ID
+P1813,String,379,short name
+P1143,String,375,BN (Argentine) editions
+P2896,Long,363,publication interval
+P437,String,363,distribution
+P3127,String,344,Latindex ID
+P2205,String,340,Spotify album ID
+P641,String,337,sport
+P2603,String,327,Kinopoisk film ID
+P625/0,Double,325,coordinate location
+P1085,String,316,LibraryThing work ID
+P1705,String,313,native label
+P2281,String,308,iTunes album ID
+P1296,String,302,Gran Enciclopèdia Catalana ID
+P1730,String,299,AllMusic song ID
+P1434,String,295,takes place in fictional universe
+P1844,String,294,HathiTrust ID
+P826,String,294,tonality
+P1325,String,292,external data available at
+P161,String,290,cast member
+P135,String,289,movement
+P1815,String,285,RSL scanned book's identifier
+P144,String,284,based on
+P2635,Long,283,number of parts of this work of art
+P1025,String,281,SUDOC editions
+P2960,String,276,archive date
+P2699,String,261,URL
+P1149,String,256,Library of Congress Classification
+P186,String,248,material used
+P2969,String,245,Goodreads book ID
+P1545,String,243,series ordinal
+P2768,String,234,BNE journal ID
+P1725,Long,231,beats per minute
+P872,String,228,printed by
+P1662,String,225,DOI prefix
+P1292,String,224,DNB editions
+P2465,String,212,Allcinema film ID
+P1435,String,211,heritage designation
+P364,String,211,original language of work
+P2284,Double,210,price
+P279,String,204,subclass of
+P1985,String,196,Anime News Network anime ID
+P820,String,196,arXiv classification
+P1661,Long,190,Alexa rank
+P1270,String,188,Norwegian Register journal ID
+P3332,String,186,ACM Digital Library citation ID
+P481,String,183,Palissy ID
+P2961,String,177,BVPH ID
+P935,String,171,Commons gallery
+P3004,String,167,Galiciana work ID
+P1448,String,166,official name
+P3192,String,164,Last.fm ID
+P1366,String,163,replaced by
+P3138,String,163,OFDb ID
+P528,String,161,catalog code
+P1182,String,157,LIBRIS editions
+P1973,String,154,RSL editions
+P3434,String,154,ERIH PLUS ID
+P2413,String,150,Fashion Model Directory magazine ID
+P1044,String,149,SWB editions
+P1113,Long,142,number of episodes
+P1142,String,134,political ideology
+P2048,Long,131,height
+P2723,String,128,Deezer album ID
+P972,String,127,catalog
+P2003,String,126,Instagram username
+P1056,String,124,product or material produced
+P3634,String,123,The Met object ID
+P485,String,123,archives at
+P825,String,123,dedicated to
+P2679,String,122,author of foreword
+P4520,String,120,SUNCAT ID
+P2207,String,116,Spotify track ID
+P2819,String,116,Yandex.Music album ID
+P349,String,116,NDL Auth ID
+P1984,String,114,Anime News Network manga ID
+P1687,String,112,Wikidata property
+P2322,String,112,article ID
+P1387,String,111,political alignment
+P2284,Long,111,price
+P1190,String,110,Universal Decimal Classification
+P449,String,110,original network
+P1365,String,109,replaces
+P3184,String,109,Czech National Bibliography book ID
+P213,String,108,ISNI
+P3589,String,108,GCD series ID
+P58,String,108,screenwriter
+P2014,String,107,Museum of Modern Art work ID
+P462,String,106,color
+P1272,String,101,Norway Import Service and Registration Authority periodical code
+P1874,String,101,Netflix ID
+P2959,String,101,permanent duplicated item
+P2529,String,100,ČSFD film ID
+P3143,String,97,elFilm film ID
+P1562,String,93,AllMovie movie ID
+P1114,Long,91,quantity
+P3222,String,91,NE.se ID
+P902,String,89,HDS ID
+P2671,String,88,Google Knowledge Graph ID
+P966,String,84,MusicBrainz label ID
+P1407,String,83,MusicBrainz series ID
+P2397,String,83,YouTube channel ID
+P434,String,82,MusicBrainz artist ID
+P2847,String,81,Google+ ID
+P409,String,81,NLA (Australia) ID
+P1424,String,79,topic's main template
+P2049,Long,77,width
+P2733,String,77,Persée journal ID
+P1242,String,74,Theatricalia play ID
+P3976,String,73,BVMC work ID
+P272,String,72,production company
+P750,String,72,distributor
+P360,String,71,is a list of
+P1037,String,68,director/manager
+P2047,Double,68,duration
+P1258,String,67,Rotten Tomatoes ID
+P452,String,66,industry
+P21,String,65,sex or gender
+P282,String,63,writing system
+P3500,String,62,Ringgold ID
+P1184,String,61,handle
+P2408,String,61,set in period
+P3131,String,61,Redalyc journal ID
+P725,String,60,voice actor
+P3569,String,59,Cultureel Woordenboek identifier
+P727,String,59,Europeana ID
+P941,String,59,inspired by
+P3132,String,58,last line
+P906,String,58,SELIBR ID
+P480,String,57,FilmAffinity ID
+P1462,String,56,standards body
+P460,String,55,said to be the same as
+P854,String,53,reference URL
+P1432,String,52,B-side (DEPRECATED)
+P1970,String,52,MovieMeter Movie ID
+P1019,String,50,web feed URL
+P106,String,50,occupation
+P2945,String,50,British Book Trade Index ID
+P421,String,50,located in time zone
+P3265,String,49,Myspace ID
+P3827,String,49,JSTOR topic ID
+P1739,String,48,CiNii book ID
+P2720,String,47,embed URL template
+P4110,String,47,Crunchyroll ID
+P749,String,47,parent organization
+P4258,String,46,Gallica ID
+P1150,String,45,Regensburg Classification
+P1236,String,45,Parsons code
+P1942,String,45,McCune-Reischauer romanization
+P2001,String,45,Revised Romanization
+P2908,String,45,SecondHandSongs song ID
+P710,String,44,participant
+P1613,String,43,IRC channel
+P2291,String,43,charted in
+P2439,String,42,not found
+P2754,String,40,production date
+P969,String,40,located at street address
+P88,String,39,commissioned by
+P949,String,39,National Library of Israel ID
+P1071,String,38,location of final assembly
+P1610,String,38,Dialnet article
+P2704,String,38,EIDR identifier
+P400,String,38,platform
+P4510,String,38,describes a project that uses
+P1265,String,37,AlloCiné film ID
+P1191,String,36,date of first performance
+P126,String,36,maintained by
+P2924,String,36,Great Russian Encyclopedia Online ID
+P4300,String,36,YouTube playlist ID
+P2735,String,35,Unz Review journal ID
+P3040,String,35,SoundCloud ID
+P344,String,35,director of photography
+P3579,String,35,Sina Weibo ID
+P3995,String,35,Filmweb.pl ID
+P740,String,35,location of formation
+P463,String,34,member of
+P4011,String,33,Semantic Scholar paper ID
+P4028,String,32,Google Scholar paper ID
+P691,String,32,NKCR AUT ID
+P2049,Double,31,width
+P2508,String,31,KINENOTE film ID
+P905,String,31,PORT film ID
+P1209,String,30,CN
+P2427,String,30,GRID ID
+P2437,Long,30,number of seasons
+P3794,String,30,Dictionary of Sydney ID
+P2048,Double,29,height
+P1269,String,28,facet of
+P2509,String,28,Movie Walker ID
+P4518,String,28,Melon album ID
+P792,String,28,chapter
+P1235,String,27,ISFDB series ID
+P271,String,27,CiNii author ID (books)
+P4035,String,27,Shironet song ID
+P408,String,27,software engine
+P793,String,27,significant event
+P1001,String,26,applies to jurisdiction
+P2638,String,26,TV.com ID
+P3431,String,26,Publons Publication ID
+P1688,String,25,not found
+P1807,String,25,Great Aragonese Encyclopedia ID
+P2346,String,25,Elonet movie ID
+P608,String,25,exhibition history
+P1054,String,24,NDL bib ID
+P178,String,24,developer
+P2724,String,24,Deezer track ID
+P3185,String,24,VK ID
+P3219,String,24,Encyclopædia Universalis ID
+P1059,String,23,CVR number
+P2631,String,23,Turner Classic Movies film ID
+P3176,String,23,uses property
+P3483,String,23,VGMdb album ID
+P569,String,23,date of birth
+P1040,String,22,film editor
+P1438,String,22,Jewish Encyclopedia ID (Russian)
+P1577,String,22,Gregory-Aland-Number
+P2334,String,22,Swedish Film Database film ID
+P2739,String,22,typeface/font used
+P3302,String,22,Open Media Database film ID
+P3308,String,22,lib.reviews ID
+P4013,String,22,Giphy username
+P4027,String,22,National Discography of Italian Song work ID
+P1451,String,21,motto text
+P1454,String,21,legal form
+P4276,String,21,Cinémathèque québécoise work identifier
+P805,String,21,statement is subject of
+P915,String,21,filming location
+P140,String,20,religion
+P1695,String,20,NLP ID
+P1953,String,20,Discogs artist ID
+P3035,String,20,ISBN publisher prefix
+P737,String,20,influenced by
+P968,String,20,e-mail
+P1219,String,19,Internet Broadway Database show ID
+P1234,String,19,ISFDB publication ID
+P2670,String,19,has parts of the class
+P2701,String,19,file format
+P281,String,19,postal code
+P3218,String,19,Auñamendi ID
+P4199,String,19,Google Play Music album ID
+P486,String,19,MeSH ID
+P1256,String,18,Iconclass notation
+P169,String,18,chief executive officer
+P19,String,18,place of birth
+P2163,String,18,FAST ID
+P2360,String,18,intended public
+P3844,String,18,Deutsche Synchronkartei film ID
+P3854,String,18,Soundtrack Collector ID
+P444,String,18,review score
+P611,String,18,religious order
+P1316,String,17,SMDB ID
+P1431,String,17,executive producer
+P1983,String,17,Anime News Network company ID
+P3710,String,17,Jewish Encyclopedia Daat ID
+P51,String,17,audio
+P2348,String,16,time period
+P2550,String,16,recording or performance of
+P3365,String,16,Treccani ID
+P1014,String,15,AAT ID
+P1267,String,15,AlloCiné series ID
+P1946,String,15,National Library of Ireland authority ID
+P2438,String,15,narrator
+P3155,String,15,Runeberg book ID
+P3221,String,15,NYT topic ID
+P3241,String,15,Catholic Encyclopedia ID
+P3836,String,15,Pinterest username
+P735,String,15,given name
+P819,String,15,ADS bibcode
+P989,String,15,spoken text audio
+P1015,String,14,BIBSYS ID
+P1581,String,14,official blog
+P2372,String,14,ODIS ID
+P2409,String,14,CiNii article ID
+P37,String,14,official language
+P3943,String,14,Tumblr ID
+P1344,String,13,participant of
+P1412,String,13,"languages spoken, written or signed"
+P1711,String,13,British Museum person-institution
+P1896,String,13,source website for the property
+P2267,String,13,PolitiFact Personality ID
+P2572,String,13,Twitter hashtag
+P3225,String,13,Corporate Number (Japan)
+P3929,String,13,V&A art work ID
+P3962,String,13,Global Trade Item Number
+P4569,String,13,BPH journal ID
+P870,String,13,instrumentation
+P1416,String,12,affiliation
+P1441,String,12,present in work
+P1574,String,12,exemplar of
+P1816,String,12,National Portrait Gallery (London) person ID
+P2333,String,12,Norwegian organisation number
+P2689,String,12,BARTOC ID
+P2761,String,12,Research Papers in Economics Series handle
+P3107,String,12,LdiF ID
+P69,String,12,educated at
+P1162,String,11,Bluebook abbreviation
+P1329,String,11,phone number
+P1608,String,11,Dialnet book ID
+P1640,String,11,curator
+P1842,String,11,Global Anabaptist Mennonite Encyclopedia Online ID
+P2782,String,11,Models.com client ID
+P3593,String,11,AFI Catalog of Feature Films ID
+P4109,String,11,URN-NBN
+P4354,String,11,search formatter URL
+P813,String,11,retrieved
+P894,String,11,zbMATH work ID
+P1161,String,10,Z39.5 abbreviation
+P1638,String,10,codename
+P1823,String,10,BAnQ work ID
+P1833,Long,10,number of registered users/contributors
+P1881,String,10,list of characters
+P2067,Long,10,mass
+P2354,String,10,has list
+P27,String,10,country of citizenship
+P287,String,10,designed by
+P3212,String,10,ISAN identifier
+P3338,String,10,Encyclopedia of Surfing ID
+P366,String,10,use
+P3868,String,10,MyDramaList title ID
+P3893,String,10,public domain date
+P3933,String,10,Cinema ID
+P4003,String,10,Facebook page ID
+P404,String,10,game mode
+P4529,String,10,Douban film ID
+P607,String,10,conflict
+P963,String,10,streaming media URL
+P1315,String,9,People Australia ID
+P1375,String,9,NSK ID
+P1566,String,9,GeoNames ID
+P2187,String,9,BiblioNet publication ID
+P2363,String,9,NMHH film rating
+P3631,String,9,Babelio work ID
+P3931,String,9,copyright holder
+P4034,String,9,Shironet artist ID
+P488,String,9,chairperson
+P570,String,9,date of death
+P10,String,8,video
+P1474,String,8,Nupill Literatura Digital - Document
+P1829,String,8,Roud Folk Song Index number
+P1960,String,8,Google Scholar author ID
+P2650,String,8,interested in
+P2666,String,8,Datahub page
+P3123,String,8,Stanford Encyclopedia of Philosophy ID
+P3258,String,8,LiveJournal ID
+P3939,String,8,ESTC citation number
+P4312,String,8,camera setup
+P443,String,8,pronunciation audio
+P4431,String,8,Google Doodle
+P508,String,8,BNCF Thesaurus ID
+P839,String,8,IMSLP ID
+P87,String,8,librettist
+P893,String,8,Social Science Research Network ID
+P1006,String,7,National Thesaurus for Author Names ID
+P1011,String,7,excluding
+P108,String,7,employer
+P1128,Long,7,employees
+P1670,String,7,LAC ID
+P1890,String,7,BNC ID
+P1981,String,7,FSK film rating
+P1994,String,7,AllMusic composition ID
+P2061,String,7,aspect ratio
+P2623,String,7,MEK ID
+P2879,String,7,Library of the National Congress of Argentina ID
+P3702,String,7,Catalogue of Illuminated Manuscripts ID
+P4230,String,7,Sefaria ID
+P4327,String,7,BHL bibliography ID
+P4480,String,7,INDUCKS publication ID
+P553,String,7,website account on
+P574,String,7,year of taxon name publication
+P823,String,7,speaker
+P827,String,7,BBC programme ID
+P1324,String,6,source code repository
+P176,String,6,manufacturer
+P1773,String,6,attributed to
+P1966,String,6,Biblioteca Nacional de Chile catalogue number
+P2067,Double,6,mass
+P2125,String,6,Revised Hepburn romanization
+P231,String,6,CAS Registry Number
+P2541,String,6,operating area
+P2683,String,6,Bekker Number
+P2770,String,6,source of income
+P2896,Double,6,publication interval
+P3106,String,6,Guardian topic ID
+P3300,String,6,musical conductor
+P3429,String,6,Electronic Enlightenment ID
+P355,String,6,subsidiary
+P3736,String,6,Eurovision Song Contest song ID
+P3789,String,6,Telegram username
+P3984,String,6,subreddit
+P669,String,6,located on street
+P683,String,6,ChEBI ID
+P746,String,6,date of disappearance
+P898,String,6,IPA transcription
+P1084,String,5,EUL editions
+P1120,Long,5,number of deaths
+P1151,String,5,topic's main Wikimedia portal
+P1207,String,5,NUKAT (WarsawU) authorities ID
+P1264,String,5,valid in period
+P1430,String,5,OpenPlaques subject ID
+P1449,String,5,nickname
+P1766,String,5,place name sign
+P1795,String,5,Smithsonian American Art Museum person/institution ID
+P1804,String,5,DNF film ID
+P1877,String,5,after a work by
+P189,String,5,location of discovery
+P20,String,5,place of death
+P2185,String,5,DLI ID
+P2507,String,5,corrigendum / erratum
+P2515,String,5,costume designer
+P2534,String,5,defining formula
+P2554,String,5,production designer
+P2680,String,5,author of afterword
+P2878,String,5,Minitel code
+P2984,String,5,Snapchat username
+P30,String,5,continent
+P3129,String,5,cine.gr film ID
+P3145,String,5,Sratim ID
+P3544,String,5,Te Papa person ID
+P371,String,5,presenter
+P4032,String,5,reviewed by
+P406,String,5,soundtrack album
+P4077,String,5,Pizmonet ID
+P4086,String,5,MyAnimeList anime ID
+P4181,String,5,GujLit Book ID
+P886,String,5,LIR
+P1004,String,4,MusicBrainz place ID
+P1051,String,4,PSH ID
+P1225,String,4,US National Archives Identifier
+P1245,String,4,OmegaWiki Defined Meaning
+P1482,String,4,Stack Exchange tag
+P149,String,4,architectural style
+P1535,String,4,used by
+P1575,String,4,RISS catalog
+P1580,String,4,University of Barcelona authority ID
+P2037,String,4,GitHub username
+P2043,Double,4,length
+P2043,Long,4,length
+P2174,String,4,Museum of Modern Art artist ID
+P234,String,4,InChI
+P2610,Double,4,thickness
+P2675,String,4,reply to
+P277,String,4,programming language
+P2888,String,4,exact match
+P2900,String,4,fax number
+P2913,String,4,date depicted
+P306,String,4,operating system
+P3342,String,4,significant person
+P3418,String,4,Google Play Store App ID
+P3495,String,4,FilmPolski.pl ID
+P3675,String,4,Hans Christian Andersen Centre work ID
+P3804,String,4,TV Guide show ID
+P3996,String,4,Bait La Zemer Ha-Ivri song ID
+P4212,String,4,PACTOLS thesaurus ID
+P4277,String,4,Daum movie ID
+P4282,String,4,LUMIERE film ID
+P447,String,4,review score by
+P4517,String,4,ctext work ID
+P4613,String,4,Encyclopedia of Modern Ukraine ID
+P61,String,4,discoverer or inventor
+P723,String,4,DBNL author ID
+P760,String,4,DPLA ID
+P889,String,4,Mathematical Reviews ID
+P92,String,4,main regulatory text
+P948,String,4,page banner
+P1005,String,3,PTBNP ID
+P103,String,3,native language
+P1092,Long,3,total produced
+P1163,String,3,media type
+P1189,String,3,Chinese Library Classification
+P1273,String,3,CANTIC-ID
+P1339,Long,3,number of injured
+P1612,String,3,Commons Institution page
+P1684,String,3,inscription
+P1728,String,3,AllMusic artist ID
+P1817,String,3,addressee
+P1870,String,3,Name Assigning Authority Number
+P1961,String,3,CTHS society ID
+P2032,String,3,work period (end)
+P2079,String,3,fabrication method
+P22,String,3,father
+P2264,String,3,mix'n'match catalogue ID
+P2342,String,3,AGORHA person/institution ID
+P235,String,3,InChIKey
+P2441,String,3,literal translation
+P2511,String,3,MSK Gent work PID
+P2518,String,3,Scope.dk film ID
+P2578,String,3,studies
+P2582,String,3,J. Paul Getty Museum object ID
+P2596,String,3,culture
+P26,String,3,spouse
+P2664,Long,3,units sold
+P274,String,3,chemical formula
+P2769,Long,3,budget
+P2814,String,3,P-number
+P3065,String,3,RERO ID
+P3135,String,3,elCinema film ID
+P3194,String,3,INA video ID
+P3383,String,3,film poster
+P3440,String,3,time signature
+P348,String,3,software version identifier
+P3733,String,3,MOOMA artist ID
+P3838,String,3,Tab4u song ID
+P3861,String,3,iTunes app ID
+P3906,String,3,Ishim ID
+P3997,String,3,Bait La Zemer Ha-Ivri artist ID
+P414,String,3,stock exchange
+P4211,String,3,Bashkir encyclopedia (Russian version) ID
+P425,String,3,field of this occupation
+P547,String,3,commemorates
+P575,String,3,time of discovery or invention
+P664,String,3,organizer
+P800,String,3,notable work
+P865,String,3,BMLO
+P1028,String,2,donated by
+P1080,String,2,from fictional universe
+P1132,Long,2,number of participants
+P1154,String,2,Scopus EID
+P1208,String,2,ISMN
+P1220,String,2,Internet Broadway Database person ID
+P1237,String,2,Box Office Mojo film ID
+P1243,String,2,International Standard Recording Code
+P1277,String,2,JUFO ID
+P1299,String,2,depicted by
+P1300,String,2,bibcode
+P1319,String,2,earliest date
+P1326,String,2,latest date
+P1346,String,2,winner
+P1392,String,2,ComicBookDB ID
+P1427,String,2,start point
+P1439,String,2,Norsk filmografi ID
+P1442,String,2,image of grave
+P1553,String,2,Yandex.Music ID
+P1561,Long,2,number of survivors
+P158,String,2,seal image
+P1617,String,2,BBC Things ID
+P1755,String,2,Aviation Safety Network accident ID
+P1830,String,2,owner of
+P1902,String,2,Spotify artist ID
+P1955,String,2,Discogs label ID
+P1962,String,2,not found
+P1978,String,2,USDA NDB number
+P2031,String,2,work period (start)
+P2044,Long,2,elevation above sea level
+P2295,Long,2,net profit
+P2339,String,2,BoardGameGeek ID
+P2403,Long,2,total assets
+P2540,String,2,Aarne–Thompson–Uther Tale Type Index
+P2561,String,2,name
+P2579,String,2,studied by
+P2639,String,2,Filmportal ID
+P2687,String,2,NDL JPNO
+P2703,String,2,BFI National Archive work ID
+P2812,String,2,MathWorld identifier
+P2936,String,2,language used
+P3141,String,2,EDb film ID
+P3174,String,2,art director
+P3183,String,2,WSJ topic ID
+P3203,String,2,Ciné-Ressources film ID
+P3267,String,2,Flickr user ID
+P3320,String,2,board member
+P3381,String,2,File Format Wiki page ID
+P3478,String,2,Songkick artist ID
+P3502,String,2,Ameblo username
+P3509,String,2,Dagens Nyheter topic ID
+P3597,String,2,F-Droid package
+P3630,String,2,Babelio author ID
+P3642,String,2,ARCHON code
+P3673,String,2,film-documentaire.fr film ID
+P369,String,2,Sandbox-Item
+P3721,String,2,public key fingerprint
+P3744,Long,2,number of subscribers
+P3762,String,2,openMLOL author ID
+P3768,String,2,Medieval Libraries of Great Britain ID
+P3808,String,2,The Numbers movie ID
+P39,String,2,position held
+P3916,String,2,UNESCO Thesaurus ID
+P4015,String,2,Vimeo username
+P4020,String,2,ISQ dimension
+P4072,String,2,Zemereshet song ID
+P4073,String,2,Wikia wiki ID
+P4087,String,2,MyAnimeList manga ID
+P4195,String,2,category for employees of the organization
+P4317,String,2,GARD rare disease ID
+P4399,String,2,Enciclopédia Itaú Cultural ID
+P479,String,2,input method
+P533,String,2,target
+P642,String,2,of
+P649,String,2,NRHP reference number
+P650,String,2,RKDartists ID
+P790,String,2,approved by
+P791,String,2,International Standard Identifier for Libraries
+P828,String,2,has cause
+P837,String,2,day in year for periodic occurrence
+P853,String,2,CERO rating
+P892,String,2,RfC ID
+P937,String,2,work location
+P958,String,2,"section, verse, or paragraph"
+P1017,String,1,BAV ID
+P102,String,1,member of political party
+P1038,String,1,relative
+P1074,String,1,fictional analog of
+P121,String,1,item operated
+P1216,String,1,National Heritage List for England number
+P1249,String,1,time of earliest written record
+P1263,String,1,NNDB people ID
+P1286,String,1,Munzinger Pop ID
+P1297,String,1,IRS Employer Identification Number
+P1320,String,1,OpenCorporates ID
+P134,String,1,has dialect (DEPRECATED)
+P1353,String,1,original spelling
+P1382,String,1,partially coincident with
+P1401,String,1,bug tracking system
+P1436,Long,1,collection or exhibition size
+P1444,String,1,destination point
+P1445,String,1,fictional universe described in
+P1455,String,1,list of works
+P1461,String,1,Patientplus ID
+P1472,String,1,Commons Creator page
+P1542,String,1,has effect
+P1546,String,1,motto
+P1552,String,1,has quality
+P1557,String,1,manifestation of
+P1558,String,1,tempo marking
+P1559,String,1,name in native language
+P1590,Long,1,number of casualties
+P1615,String,1,CLARA-ID
+P1618,String,1,sport number
+P1659,String,1,see also
+P1669,String,1,CONA ID
+P167,String,1,structure replaced by
+P1683,String,1,quote
+P1709,String,1,equivalent class
+P172,String,1,ethnic group
+P1725,Double,1,beats per minute
+P1733,String,1,Steam Application ID
+P1754,String,1,category related to list
+P1775,String,1,follower of
+P1792,String,1,category of associated people
+P1801,String,1,commemorative plaque image
+P1821,String,1,Open Food Facts food category ID
+P1840,String,1,investigated by
+P1933,String,1,MobyGames ID
+P1934,String,1,Animator.ru film ID
+P1938,String,1,Project Gutenberg author ID
+P1963,String,1,properties for this type
+P2000,String,1,CPDL ID
+P2011,String,1,Cooper-Hewitt Person ID
+P2019,String,1,AllMovie artist ID
+P2042,String,1,Artsy artist ID
+P208,String,1,executive body
+P2088,String,1,Crunchbase organisation ID
+P2098,String,1,substitute/deputy/replacement of office/officeholder
+P2124,Long,1,member count
+P2139,Long,1,total revenue
+P2144,Long,1,frequency
+P2184,String,1,history of topic
+P2190,String,1,C-SPAN person ID
+P2234,Long,1,volume as quantity
+P2252,String,1,National Gallery of Art artist ID
+P2257,Long,1,frequency of event
+P2272,String,1,Hederich encyclopedia article ID
+P2279,String,1,ambitus
+P2315,String,1,comment (DEPRECATED)
+P2318,String,1,debut participant
+P233,String,1,canonical SMILES
+P2344,String,1,AGORHA work ID
+P2349,String,1,Stuttgart Database of Scientific Illustrators ID
+P2361,String,1,online service
+P2369,String,1,Soccerway player ID
+P2390,String,1,Ballotpedia ID
+P242,String,1,locator map image
+P245,String,1,ULAN ID
+P25,String,1,mother
+P2512,String,1,series spin-off
+P2513,String,1,Jamendo album ID
+P2526,String,1,National Historic Sites of Canada ID
+P2567,String,1,amended by
+P2607,String,1,BookBrainz creator ID
+P2610,Long,1,thickness
+P2612,String,1,TED topic ID
+P2629,String,1,BBFC rating
+P2633,String,1,geography of topic
+P2635,Double,1,number of parts of this work of art
+P2652,String,1,partnership with
+P2657,String,1,EU Transparency Register ID
+P2667,String,1,corresponding template
+P2684,String,1,Kijkwijzer rating
+P2715,String,1,elected in
+P2738,String,1,disjoint union of
+P2747,String,1,Filmiroda rating
+P2748,String,1,PRONOM file format identifier
+P2750,String,1,Photographers' Identities Catalog ID
+P2755,String,1,exploitation visa number
+P2756,String,1,EIRIN film rating
+P2843,String,1,Benezit ID
+P2869,String,1,record or record progression
+P2883,String,1,HKMDb film ID
+P2886,String,1,Shakeosphere person ID
+P2910,String,1,icon
+P2942,String,1,Dailymotion channel ID
+P2963,String,1,Goodreads author ID
+P2966,String,1,National Library of Wales ID
+P3025,String,1,open days
+P3043,String,1,Scoresway soccer person ID
+P3098,String,1,ClinicalTrials.gov Identifier
+P3112,String,1,DistroWatch ID
+P3156,String,1,Australian Classification
+P3157,Long,1,event distance
+P3180,String,1,Visual Novel Database ID
+P3206,String,1,data.gouv.fr org ID
+P3231,String,1,Mediaarts-DB ID
+P3254,String,1,property proposal discussion
+P3274,String,1,content deliverer
+P3280,String,1,BanQ author ID
+P3285,String,1,Mathematics Subject Classification ID
+P3352,String,1,musipedia tune ID
+P3362,Long,1,operating income
+P3376,String,1,Enterprise number (Belgium)
+P3402,String,1,CNC film rating (Romania)
+P3414,String,1,Yle Areena ID
+P3479,String,1,Omni topic ID
+P3482,String,1,Europeana Fashion creator ID
+P3576,String,1,TLG author ID
+P359,String,1,Rijksmonument ID
+P3608,String,1,EU VAT number
+P3612,String,1,Le Monde diplomatique subject ID
+P3650,String,1,JMK film rating
+P3732,String,1,PhilPapers record
+P3761,String,1,IPv4 routing prefix
+P3764,String,1,pole position
+P3782,String,1,Artnet artist ID
+P3784,String,1,CiteSeerX article ID
+P3793,String,1,IPv6 routing prefix
+P3801,String,1,INEGI municipality ID
+P3821,String,1,Bangla Movie Database ID
+P3832,String,1,Europeana Fashion Vocabulary ID
+P3839,String,1,Tab4u artist ID
+P3851,String,1,cinenacional.com movie ID
+P3894,String,1,OSTI article ID
+P3951,String,1,BioRxiv ID
+P3952,String,1,Stereo Ve Mono artist ID
+P396,String,1,SBN author ID
+P3964,String,1,BDCYL authority ID
+P3987,String,1,SHARE Catalogue author ID
+P40,String,1,child
+P4033,String,1,Mastodon address
+P4041,String,1,Rock.com.ar album ID
+P4090,String,1,Biodiversity Repository ID
+P4101,String,1,dissertation submitted to
+P4104,String,1,Carnegie Hall agent ID
+P413,String,1,position played on team / speciality
+P4167,String,1,Dagens Næringsliv topic ID
+P4200,String,1,Christie's creator ID
+P4218,Long,1,shelf life
+P4221,String,1,National Criminal Justice ID
+P4226,String,1,Cyworld ID
+P4228,String,1,Encyclopedia of Australian Science ID
+P4239,String,1,vocalized name
+P4254,String,1,Banglapedia (Bengali version) ID
+P4255,String,1,Banglapedia (English version) ID
+P426,String,1,aircraft registration
+P4264,String,1,LinkedIn company ID
+P4272,String,1,DPLA subject ID
+P4286,String,1,Nominis saint ID
+P4290,String,1,official app
+P4295,Long,1,readership
+P4329,String,1,Wikimedia template that populates this category
+P4436,String,1,The Coptic Library ID
+P4459,String,1,Dictionary of Spanish Biography ID
+P4466,String,1,Unified Astronomy Thesaurus ID
+P4485,String,1,INDUCKS miniseries ID
+P4577,String,1,Tidal album ID
+P4579,String,1,Tidal video ID
+P4603,String,1,Microsoft Store album ID
+P4632,String,1,Bechdel Test Movie List ID
+P467,String,1,legislated by
+P477,String,1,Canadian Register of Historic Places ID
+P487,String,1,Unicode character
+P509,String,1,cause of death
+P512,String,1,academic degree
+P518,String,1,applies to part
+P520,String,1,armament
+P523,String,1,temporal range start
+P535,String,1,Find A Grave memorial ID
+P54,String,1,member of sports team
+P551,String,1,residence
+P559,String,1,terminus
+P560,String,1,direction
+P609,String,1,terminus location
+P625/0,Long,1,coordinate location
+P633,String,1,Quebec cultural heritage directory ID
+P652,String,1,UNII
+P703,String,1,found in taxon
+P708,String,1,diocese
+P734,String,1,family name
+P797,String,1,authority
+P808,String,1,Bien de Interés Cultural (BIC) code
+P822,String,1,mascot
+P849,String,1,Japanese military aircraft designation
+P850,String,1,WoRMS-ID
+P913,String,1,notation
+P942,String,1,theme music
+P946,String,1,ISIN
+P971,String,1,category combines topics
+P998,String,1,DMOZ ID

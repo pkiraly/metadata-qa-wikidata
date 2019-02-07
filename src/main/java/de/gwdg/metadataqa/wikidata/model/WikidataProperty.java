@@ -1,6 +1,6 @@
 package de.gwdg.metadataqa.wikidata.model;
 
-public class WikidataProperty {
+public class WikidataProperty implements Wikidata {
   String id;
   String type;
   String label;
