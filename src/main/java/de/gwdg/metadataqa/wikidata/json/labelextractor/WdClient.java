@@ -128,9 +128,10 @@ public class WdClient implements LabelExtractor {
             labels.put(entityIds.get(lineNumber), label);
           }
         } else {
-          System.err.println("Unexpected line: " + line);
           if (entityIds.size() == 1) {
             labels.put(entityIds.get(lineNumber), line);
+          } else {
+            System.err.println("Unexpected line: " + line);
           }
         }
         lineNumber++;

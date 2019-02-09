@@ -50,7 +50,6 @@ public class PageValidatorTest {
             invalidCounter++;
         } catch (InvalidPageNumberException e) {
           invalidCounter++;
-          // System.err.println(e.getMessage());
           if (!counter.containsKey(e.getType())) {
             counter.put(e.getType(), 0);
           }
@@ -62,7 +61,6 @@ public class PageValidatorTest {
             }
             patternCounter.put(key, patternCounter.get(key) + 1);
           }
-          // e.printStackTrace();
         }
       });
     } catch (IOException e) {

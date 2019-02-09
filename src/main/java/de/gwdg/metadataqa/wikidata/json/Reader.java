@@ -1,13 +1,12 @@
 package de.gwdg.metadataqa.wikidata.json;
 
 import com.opencsv.CSVWriter;
-import de.gwdg.metadataqa.wikidata.Command;
 import de.gwdg.metadataqa.wikidata.json.labelextractor.JenaBasedSparqlClient;
 import de.gwdg.metadataqa.wikidata.json.labelextractor.WdClient;
 import de.gwdg.metadataqa.wikidata.model.Wikidata;
 import de.gwdg.metadataqa.wikidata.model.WikidataEntity;
+import de.gwdg.metadataqa.wikidata.model.WikidataProperty;
 import de.gwdg.metadataqa.wikidata.model.WikidataType;
-import org.apache.commons.lang3.StringUtils;
 import org.json.simple.parser.JSONParser;
 
 import java.io.BufferedReader;
@@ -21,6 +20,7 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,14 +30,16 @@ import java.util.regex.Pattern;
 public abstract class Reader {
 
   private static final Pattern ENTITY_ID_PATTERN = Pattern.compile("^Q\\d+$");
+  private static final Pattern PROPERTY_ID_PATTERN = Pattern.compile("^P\\d+$");
+
   private static final String API_URL_PATTERN =
     "https://www.wikidata.org/wiki/Special:EntityData/%s.json";
   public static final Charset CHARSET = Charset.forName("UTF-8");
   private final String propertiesFile;
   private final String entitiesFile;
+  protected Map<String, Boolean> unknownProperties = new HashMap<>();
 
   protected static int recordCounter = 0;
-  private static Map<String, Integer> container = new HashMap<>();
   protected static JSONParser parser = new JSONParser();
   protected Map<String, Wikidata> properties = new HashMap<>();
   protected Map<String, Wikidata> entities = new HashMap<>();
@@ -46,12 +48,10 @@ public abstract class Reader {
   protected LabelExtractor extractor;
   private long duration = 0;
 
-  protected Command command;
   protected PrintWriter out = null;
   private CsvManager csvManager = new CsvManager();
 
-  public Reader(Command command, String propertiesFile, String entitiesFile) {
-    this.command = command;
+  public Reader(String propertiesFile, String entitiesFile) {
     this.propertiesFile = propertiesFile;
     this.entitiesFile = entitiesFile;
     properties = csvManager.readCsv(propertiesFile, WikidataType.PROPERTIES);
@@ -65,8 +65,24 @@ public abstract class Reader {
   abstract public void read(String jsonString);
 
   protected String resolveProperty(String propertyId) {
-    if (properties.containsKey(propertyId))
+    if (properties.containsKey(propertyId)) {
       return properties.get(propertyId).getLabel();
+    } else {
+      if (!unknownProperties.containsKey(propertyId)) {
+        unknownProperties.put(propertyId, true);
+        if (PROPERTY_ID_PATTERN.matcher(propertyId).matches()) {
+          System.err.printf("Unknow property: %s%n", propertyId);
+          Map<String, String> labels = extractor.getLabels(Arrays.asList(propertyId));
+          for (Map.Entry<String, String> label : labels.entrySet()) {
+            if (!properties.containsKey(label.getKey())) {
+              properties.put(label.getKey(), new WikidataProperty(label.getKey(), label.getValue()));
+            } else {
+              System.err.printf("Property is already there %s %s%n", label.getKey(), label.getValue());
+            }
+          }
+        }
+      }
+    }
     return propertyId;
   }
 
@@ -121,21 +137,8 @@ public abstract class Reader {
     // return path.equals("/") ? "/" + key : String.format("%s/%s", path, key);
   }
 
-  protected static void addContainer(List<String> path, String key, String type) {
-    key = StringUtils.join("/", path) + "/" + key;
-    String typedKey = String.format("%s (%s)", key, type);
-    if (!container.containsKey(typedKey)) {
-      container.put(typedKey, 0);
-    }
-    container.put(typedKey, container.get(typedKey) + 1);
-  }
-
   public static int getRecordCounter() {
     return recordCounter;
-  }
-
-  public static Map<String, Integer> getContainer() {
-    return container;
   }
 
   protected String resolvePath(List<String> path) {
@@ -219,7 +222,6 @@ public abstract class Reader {
     FileWriter writer = null;
     try {
       writer = new FileWriter(entitiesFile);
-      //using custom delimiter and quote character
       CSVWriter csvWriter = new CSVWriter(writer);
 
       List<String[]> data = entitiesToStringArray();
@@ -231,6 +233,44 @@ public abstract class Reader {
     }
   }
 
+  public void saveProperties() {
+    if (unknownProperties.size() == 0)
+      return;
+
+    System.err.printf(
+      "save entities: %d new/%d total (entities import took %d ms)\n",
+      unknownProperties.size(),
+      properties.size(),
+      duration
+    );
+    duration = 0;
+    FileWriter writer = null;
+    try {
+      writer = new FileWriter(propertiesFile);
+      CSVWriter csvWriter = new CSVWriter(writer);
+
+      List<String[]> data = propertiesToStringArray();
+
+      csvWriter.writeAll(data);
+      csvWriter.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private List<String[]> propertiesToStringArray() {
+    List<String[]> records = new ArrayList<String[]>();
+
+    // adding header record
+    records.add(new String[]{"id", "label", "datatype"});
+
+    for (Map.Entry<String, Wikidata> entry : properties.entrySet()) {
+      records.add(entry.getValue().asArray());
+    }
+
+    return records;
+  }
+
   private List<String[]> entitiesToStringArray() {
     List<String[]> records = new ArrayList<String[]>();
 
@@ -238,7 +278,7 @@ public abstract class Reader {
     records.add(new String[]{"id", "label"});
 
     for (Map.Entry<String, Wikidata> entry : entities.entrySet()) {
-      records.add(new String[]{entry.getKey(), entry.getValue().getLabel()});
+      records.add(entry.getValue().asArray());
     }
 
     return records;

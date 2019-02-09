@@ -1,14 +1,19 @@
 package de.gwdg.metadataqa.wikidata.model;
 
 public class WikidataProperty implements Wikidata {
-  String id;
-  String type;
-  String label;
+  private String id;
+  private String label;
+  private String type = "";
+  private String[] asArray;
 
-  public WikidataProperty(String id, String type, String label) {
+  public WikidataProperty(String id, String label) {
     this.id = id;
-    this.type = type;
     this.label = label;
+  }
+
+  public WikidataProperty(String id, String label, String type) {
+    this(id, label);
+    this.type = type;
   }
 
   public String getId() {
@@ -21,5 +26,13 @@ public class WikidataProperty implements Wikidata {
 
   public String getLabel() {
     return label;
+  }
+
+  @Override
+  public String[] asArray() {
+    if (asArray == null) {
+      asArray = new String[]{id, label, type};
+    }
+    return asArray;
   }
 }

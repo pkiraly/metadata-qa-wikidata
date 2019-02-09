@@ -1,6 +1,5 @@
 package de.gwdg.metadataqa.wikidata.json;
 
-import de.gwdg.metadataqa.wikidata.Command;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -9,8 +8,10 @@ import java.util.Iterator;
 
 public class JsonTransformer extends Reader {
 
-  public JsonTransformer(Command command, String propertiesFile, String entitiesFile) {
-    super(command, propertiesFile, entitiesFile);
+  private String id = "id";
+
+  public JsonTransformer(String propertiesFile, String entitiesFile) {
+    super(propertiesFile, entitiesFile);
   }
 
   public void read(String jsonString) {
@@ -38,24 +39,27 @@ public class JsonTransformer extends Reader {
     for (Object keyObj : input.keySet()) {
       String key = (String) keyObj;
       Object value = input.get(keyObj);
-      String type = value.getClass().getSimpleName();
+      if (isRoot && key.equals(id)) {
+        record.put(key, value);
+      }
+
       boolean processChild = !isRoot || key.equals("claims");
       String resolvedProperty = resolveProperty(key);
       // System.err.printf("%s - is root: %s, processChild: %s%n", key, isRoot, processChild);
 
       if (processChild) {
-        if (type.equals("String")) {
+        if (value instanceof String) {
           record.put(resolvedProperty, resolveValue((String)value));
-        } else if (type.equals("Long")) {
+        } else if (value instanceof Long) {
           record.put(resolvedProperty, value);
-        } else if (type.equals("Double")) {
+        } else if (value instanceof Double) {
           record.put(resolvedProperty, value);
-        } else if (type.equals("JSONArray")) {
+        } else if (value instanceof JSONArray) {
           record.put(resolvedProperty, process((JSONArray)value));
-        } else if (type.equals("JSONObject")) {
+        } else if (value instanceof JSONObject) {
           record.put(resolvedProperty, process(false, (JSONObject)value));
         } else {
-          System.err.println("unknown type [in object]: " + type);
+          System.err.println("unknown type [in object]: " + value.getClass().getSimpleName());
         }
       }
     }
@@ -68,24 +72,22 @@ public class JsonTransformer extends Reader {
     int i = 0;
     if (it.hasNext()) {
       Object item = it.next();
-      String type = item.getClass().getSimpleName();
 
-      if (type.equals("String")) {
+      if (item instanceof String) {
         output.add(resolveValue((String)item));
-      } else if (type.equals("Long")) {
+      } else if (item instanceof Long) {
         output.add(item);
-      } else if (type.equals("Double")) {
+      } else if (item instanceof Double) {
         output.add(item);
-      } else if (type.equals("JSONArray")) {
+      } else if (item instanceof JSONArray) {
         output.add(process((JSONArray)item));
-      } else if (type.equals("JSONObject")) {
+      } else if (item instanceof JSONObject) {
         output.add(process(true, (JSONObject)item));
       } else {
-        System.err.println("unknown type [array]: " + type);
+        System.err.println("unknown type [array]: " + item.getClass().getSimpleName());
       }
       i++;
     }
     return output;
   }
-
 }

@@ -69,12 +69,14 @@ public class Client {
                                       String input,
                                       Command command,
                                       int processingLimit) {
-    final Reader reader = command.equals(Command.ENTITY_RESOLUTION)
-      ? new EntityResolver(command, propertiesFile, entitiesFile)
-      : (command.equals(Command.TRANSFORMATION)
-        ? new JsonTransformer(command, propertiesFile, entitiesFile)
-        : null
-      );
+    final Reader reader;
+    if (command.equals(Command.ENTITY_RESOLUTION)) {
+      reader = new EntityResolver(propertiesFile, entitiesFile);
+    } else if (command.equals(Command.TRANSFORMATION)) {
+      reader = new JsonTransformer(propertiesFile, entitiesFile);
+    } else {
+      reader = null;
+    }
     reader.setOutputFileName(parameters.getOutputFile());
 
     Stream<String> lines = null;
@@ -98,7 +100,7 @@ public class Client {
     reader.saveEntities();
 
     System.err.println(reader.getRecordCounter());
-    Map<String, Integer> container = reader.getContainer();
+    // Map<String, Integer> container = reader.getContainer();
   }
 
   private static void resolveEntityClasses(String entitiesFile) {

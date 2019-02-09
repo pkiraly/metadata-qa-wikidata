@@ -11,12 +11,13 @@ public class WikidataEntity implements Wikidata {
   private String id;
   private String type;
   private String label;
+  private String[] asArray;
   private Map<String, String> classes;
   private String serializedClasses;
 
   public WikidataEntity(String id, String label) {
     this.id = id;
-    this.type = type;
+    this.type = "";
     this.label = label;
   }
 
@@ -66,5 +67,14 @@ public class WikidataEntity implements Wikidata {
       }
     }
     return entries;
+  }
+
+  @Override
+  public String[] asArray() {
+    if (asArray == null) {
+      asArray = new String[]{id, label};
+    }
+    return asArray;
+
   }
 }

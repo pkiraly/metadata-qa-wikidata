@@ -23,7 +23,12 @@ public class CsvManager {
       reader = new CSVReader(new FileReader(csvFile));
       while ((line = reader.readNext()) != null) {
         if (type.equals(WikidataType.PROPERTIES)) {
-          WikidataProperty property = new WikidataProperty(line[0], line[1], line[3]);
+          WikidataProperty property;
+          if (line.length == 2) {
+            property = new WikidataProperty(line[0], line[1]);
+          } else {
+            property = new WikidataProperty(line[0], line[1], line[2]);
+          }
           list.put(property.getId(), property);
         } else if (type.equals(WikidataType.ENTITIES)) {
           WikidataEntity entity = new WikidataEntity(line[0], line[1]);
