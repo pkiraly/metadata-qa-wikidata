@@ -44,11 +44,13 @@ public class WdClient implements LabelExtractor {
   public String getLabel(String entityId) {
     String label = entityId;
     try {
-      String cmd = String.format(WD_DATA_CMD_PATTERN, entityId);
+      // String cmd = String.format(WD_DATA_CMD_PATTERN, entityId);
+      String cmd = String.format(WD_LABEL_CMD_PATTERN, entityId);
       Process process = runtime.exec(cmd);
       process.waitFor();
       String json = extractJsonFromWd(process.getInputStream());
-      label = Utils.extractEntityLabel(json);
+      label = json;
+      // label = Utils.extractEntityLabel(json);
     } catch (IOException e) {
       e.printStackTrace();
     } catch (InterruptedException e) {
@@ -81,6 +83,11 @@ public class WdClient implements LabelExtractor {
     }
     return labels;
 
+  }
+
+  @Override
+  public Map<String, String> getClasses(String entityId) {
+    return null;
   }
 
   private String extractJsonFromWd(InputStream inputStream) {

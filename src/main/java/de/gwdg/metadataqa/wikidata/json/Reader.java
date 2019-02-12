@@ -7,6 +7,7 @@ import de.gwdg.metadataqa.wikidata.model.Wikidata;
 import de.gwdg.metadataqa.wikidata.model.WikidataEntity;
 import de.gwdg.metadataqa.wikidata.model.WikidataProperty;
 import de.gwdg.metadataqa.wikidata.model.WikidataType;
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.parser.JSONParser;
 
 import java.io.BufferedReader;
@@ -43,6 +44,7 @@ public abstract class Reader {
   protected static JSONParser parser = new JSONParser();
   protected Map<String, Wikidata> properties = new HashMap<>();
   protected Map<String, Wikidata> entities = new HashMap<>();
+  protected Map<String, Integer> entitiesCounter = new HashMap<>();
   protected int newEntitiesCount = 0;
   // private JenaBasedSparqlClient sparqlClient = new JenaBasedSparqlClient();
   protected LabelExtractor extractor;
@@ -69,21 +71,42 @@ public abstract class Reader {
       return properties.get(propertyId).getLabel();
     } else {
       if (!unknownProperties.containsKey(propertyId)) {
-        unknownProperties.put(propertyId, true);
-        if (PROPERTY_ID_PATTERN.matcher(propertyId).matches()) {
-          System.err.printf("Unknow property: %s%n", propertyId);
-          Map<String, String> labels = extractor.getLabels(Arrays.asList(propertyId));
-          for (Map.Entry<String, String> label : labels.entrySet()) {
-            if (!properties.containsKey(label.getKey())) {
-              properties.put(label.getKey(), new WikidataProperty(label.getKey(), label.getValue()));
-            } else {
-              System.err.printf("Property is already there %s %s%n", label.getKey(), label.getValue());
+        if (!propertyId.equals("claims") && !propertyId.equals("type")) {
+          unknownProperties.put(propertyId, true);
+          if (PROPERTY_ID_PATTERN.matcher(propertyId).matches()) {
+            System.err.printf("Unknow property: %s%n", propertyId);
+            Map<String, String> labels = extractor.getLabels(Arrays.asList(propertyId));
+            for (Map.Entry<String, String> label : labels.entrySet()) {
+              if (!properties.containsKey(label.getKey())) {
+                properties.put(label.getKey(), new WikidataProperty(label.getKey(), label.getValue()));
+              } else {
+                System.err.printf("Property is already there %s %s%n", label.getKey(), label.getValue());
+              }
             }
           }
         }
       }
     }
     return propertyId;
+  }
+
+  protected String resolveValue(String value, boolean skipResolution) {
+    if (skipResolution) {
+      countValues(value);
+      return null;
+    } else {
+      return resolveValue(value);
+    }
+  }
+
+  protected void countValues(String value) {
+    String entityId = value;
+    if (ENTITY_ID_PATTERN.matcher(entityId).matches()) {
+      if (!entitiesCounter.containsKey(entityId)) {
+        entitiesCounter.put(entityId, 0);
+      }
+      entitiesCounter.put(entityId, entitiesCounter.get(entityId) + 1);
+    }
   }
 
   protected String resolveValue(String value) {
@@ -208,29 +231,59 @@ public abstract class Reader {
     out.close();
   }
 
+  public void saveState() {
+    saveEntities();
+    saveProperties();
+    saveCounter();
+  }
+
+  public void saveCounter() {
+    FileWriter writer = null;
+    try {
+      writer = new FileWriter("entities-count.csv");
+      CSVWriter csvWriter = new CSVWriter(writer);
+      csvWriter.writeNext(new String[]{"id", "count"});
+      for (Map.Entry<String, Integer> entry : entitiesCounter.entrySet()) {
+        csvWriter.writeNext(
+          new String[]{entry.getKey(), entry.getValue().toString()},
+          false
+        );
+      }
+      csvWriter.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+  }
+
   public void saveEntities() {
     if (newEntitiesCount == 0)
       return;
 
     System.err.printf(
-      "save entities: %d new/%d total (entities import took %d ms)\n",
+      "save entities: %d new/%d total (entities import took %.3f s)%n",
       newEntitiesCount,
       entities.size(),
-      duration
+      (duration / 1000.0)
     );
     duration = 0;
+    long start = System.currentTimeMillis();
     FileWriter writer = null;
     try {
       writer = new FileWriter(entitiesFile);
       CSVWriter csvWriter = new CSVWriter(writer);
-
-      List<String[]> data = entitiesToStringArray();
-
-      csvWriter.writeAll(data);
+      csvWriter.writeNext(new String[]{"id", "label"});
+      for (Map.Entry<String, Wikidata> entry : entities.entrySet()) {
+        csvWriter.writeNext(entry.getValue().asArray());
+      }
       csvWriter.close();
     } catch (IOException e) {
       e.printStackTrace();
     }
+    System.err.printf(
+      "save to file took %.3f s)%n",
+      ((System.currentTimeMillis() - start) / 1000.0)
+    );
   }
 
   public void saveProperties() {
@@ -238,20 +291,23 @@ public abstract class Reader {
       return;
 
     System.err.printf(
-      "save entities: %d new/%d total (entities import took %d ms)\n",
+      "save properties: %d new/%d total (properties import took %d ms)\n",
       unknownProperties.size(),
       properties.size(),
       duration
     );
+    for (Map.Entry<String, Boolean> entry : unknownProperties.entrySet()) {
+      System.err.println(entry.getKey());
+    }
     duration = 0;
     FileWriter writer = null;
     try {
       writer = new FileWriter(propertiesFile);
       CSVWriter csvWriter = new CSVWriter(writer);
-
-      List<String[]> data = propertiesToStringArray();
-
-      csvWriter.writeAll(data);
+      csvWriter.writeNext(new String[]{"id", "label", "datatype"});
+      for (Map.Entry<String, Wikidata> entry : properties.entrySet()) {
+        csvWriter.writeNext(entry.getValue().asArray());
+      }
       csvWriter.close();
     } catch (IOException e) {
       e.printStackTrace();

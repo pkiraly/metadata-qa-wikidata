@@ -15,6 +15,10 @@ public class WikidataEntity implements Wikidata {
   private Map<String, String> classes;
   private String serializedClasses;
 
+  public WikidataEntity(String id) {
+    this.id = id;
+  }
+
   public WikidataEntity(String id, String label) {
     this.id = id;
     this.type = "";
@@ -35,6 +39,10 @@ public class WikidataEntity implements Wikidata {
 
   public String getLabel() {
     return label;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
   }
 
   public Map<String, String> getClasses() {
@@ -71,10 +79,10 @@ public class WikidataEntity implements Wikidata {
 
   @Override
   public String[] asArray() {
-    if (asArray == null) {
-      asArray = new String[]{id, label};
-    }
-    return asArray;
+    // if (asArray == null) {
+    //   asArray = new String[]{id, label};
+    // }
+    return new String[]{id, label};
 
   }
 }

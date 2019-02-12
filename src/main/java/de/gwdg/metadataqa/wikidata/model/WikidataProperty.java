@@ -30,9 +30,9 @@ public class WikidataProperty implements Wikidata {
 
   @Override
   public String[] asArray() {
-    if (asArray == null) {
-      asArray = new String[]{id, label, type};
-    }
-    return asArray;
+    // if (asArray == null) {
+    //   asArray = new String[]{id, label, type};
+    // }
+    return new String[]{id, label, type};
   }
 }

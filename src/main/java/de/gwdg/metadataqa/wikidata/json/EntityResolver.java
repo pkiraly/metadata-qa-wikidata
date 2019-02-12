@@ -16,6 +16,7 @@ public class EntityResolver extends Reader {
   private static JSONParser parser = new JSONParser();
   private static Map<String, Integer> container = new HashMap<>();
   private static List<String> rootProperties = Arrays.asList("labels", "descriptions", "aliases", "sitelinks");
+  private boolean skipResolution = false;
 
   public EntityResolver(String propertiesFile, String entitiesFile) {
     super(propertiesFile, entitiesFile);
@@ -55,7 +56,7 @@ public class EntityResolver extends Reader {
 
       addContainer(key);
       if (value instanceof String) {
-        String resolvedValue = resolveValue(value.toString());
+        String resolvedValue = resolveValue(value.toString(), skipResolution);
       } else if (value instanceof Long) {
         //
       } else if (value instanceof Double) {
@@ -76,7 +77,7 @@ public class EntityResolver extends Reader {
       Object item = it.next();
 
       if (item instanceof String) {
-        resolveValue(item.toString());
+        resolveValue(item.toString(), skipResolution);
       } else if (item instanceof Long) {
         // addContainer(path, "Long");
       } else if (item instanceof Double) {
@@ -101,5 +102,9 @@ public class EntityResolver extends Reader {
 
   public static Map<String, Integer> getContainer() {
     return container;
+  }
+
+  public void setSkipResolution(boolean skipResolution) {
+    this.skipResolution = skipResolution;
   }
 }

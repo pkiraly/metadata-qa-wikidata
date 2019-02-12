@@ -19,6 +19,7 @@ public class CliParameters {
     options.addOption("c", "command", true, "command");
     options.addOption("l", "processing-limit", true, "command");
     options.addOption("h", "help", false, "help");
+    options.addOption("s", "skip-resolution", false, "help");
   }
 
   private String inputFile;
@@ -28,6 +29,7 @@ public class CliParameters {
   private boolean help = false;
   private Command command;
   private int processingLimit = 0;
+  private boolean skipResolution = false;
 
   public CliParameters(String[] arguments) throws ParseException {
     CommandLine cmd = parser.parse(options, arguments);
@@ -62,6 +64,9 @@ public class CliParameters {
 
     if (cmd.hasOption("help"))
       help = true;
+
+    if (cmd.hasOption("skip-resolution"))
+      skipResolution = true;
   }
 
   public String getInputFile() {
@@ -96,15 +101,20 @@ public class CliParameters {
     return options;
   }
 
+  public boolean isSkipResolution() {
+    return skipResolution;
+  }
+
   @Override
   public String toString() {
-    return "parameters: " + "\n" +
-      "command='" + command + '\'' + "\n" +
-      "input-file='" + inputFile + '\'' + "\n" +
-      "output-file='" + outputFile + '\'' + "\n" +
-      "property-file='" + propertyFile + '\'' + "\n" +
-      "entity-file='" + entityFile + '\'' + "\n" +
-      "processing-limit='" + processingLimit + '\'' + "\n" +
-      "help=" + help + "\n";
+    return "[parameters]" + "\n" +
+      "  command: " + command + "\n" +
+      "  input-file: " + inputFile + "\n" +
+      "  output-file: " + outputFile + "\n" +
+      "  property-file: " + propertyFile + "\n" +
+      "  entity-file: " + entityFile + "\n" +
+      "  processing-limit: " + processingLimit + "\n" +
+      "  skip-resolution: " + skipResolution + "\n" +
+      "  help: " + help + "\n";
   }
 }

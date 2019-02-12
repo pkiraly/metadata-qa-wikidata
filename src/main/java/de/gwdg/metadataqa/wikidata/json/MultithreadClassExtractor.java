@@ -3,6 +3,7 @@ package de.gwdg.metadataqa.wikidata.json;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import de.gwdg.metadataqa.wikidata.json.labelextractor.JenaBasedSparqlClient;
+import de.gwdg.metadataqa.wikidata.json.labelextractor.WdClient;
 import de.gwdg.metadataqa.wikidata.model.WikidataEntity;
 import org.apache.commons.lang3.StringUtils;
 
@@ -22,7 +23,7 @@ public class MultithreadClassExtractor {
 
   private final String inputFileName;
   private Map<String, WikidataEntity> entities = new HashMap<>();
-  private final JenaBasedSparqlClient sparqlClient;
+  private final LabelExtractor labelExtractor;
   private AtomicInteger newEntitiesCount = new AtomicInteger();
   private long duration = 0;
   private int autoSaveTreshold = 1000;
@@ -32,24 +33,63 @@ public class MultithreadClassExtractor {
     this.inputFileName = inputFileName;
     this.numberOfThreads = numberOfThreads;
     readCsv(inputFileName);
-    sparqlClient = new JenaBasedSparqlClient();
+    // sparqlClient = new JenaBasedSparqlClient();
+    labelExtractor = new WdClient();
   }
 
-  public void resolveAll() {
+  public void resolveAllClasses() {
     long start = System.currentTimeMillis();
     // long startSaving = 0;
     ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
     for (WikidataEntity entity : entities.values()) {
       if (entity.getClasses() == null || entity.getClasses().isEmpty()) {
         Runnable task = () -> {
-          entity.setClasses(sparqlClient.getClasses(entity.getId()));
+          entity.setClasses(labelExtractor.getClasses(entity.getId()));
           int i = newEntitiesCount.incrementAndGet();
           if (autoSaveTreshold != 0
             && i > 0
             && i % autoSaveTreshold == 0) {
             long startSaving = System.currentTimeMillis();
             saveEntities(inputFileName);
-            System.err.printf("saved so far %d records, took %d ms%n", i, (System.currentTimeMillis() - startSaving));
+            System.err.printf("saved so far %d records, took %d ms%n",
+              i,
+              (System.currentTimeMillis() - startSaving));
+          }
+        };
+        executor.submit(task);
+      }
+    }
+    executor.shutdown();
+
+    while (!executor.isTerminated()) {
+      try {
+        TimeUnit.SECONDS.sleep(1);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+    duration += (System.currentTimeMillis() - start);
+  }
+
+  public void resolveAllLabels() {
+    long start = System.currentTimeMillis();
+    // long startSaving = System.currentTimeMillis();
+    ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
+    for (WikidataEntity entity : entities.values()) {
+      if (StringUtils.isBlank(entity.getLabel())) {
+        Runnable task = () -> {
+          entity.setLabel(labelExtractor.getLabel(entity.getId()));
+          int i = newEntitiesCount.incrementAndGet();
+          if (autoSaveTreshold != 0
+            && i > 0
+            && i % autoSaveTreshold == 0) {
+            long startSaving = System.currentTimeMillis();
+            saveEntities(inputFileName);
+            System.err.printf(
+              "saved so far %d records, took %.3f ms%n",
+              i,
+              ((System.currentTimeMillis() - startSaving) / 1000)
+            );
           }
         };
         executor.submit(task);
@@ -81,7 +121,12 @@ public class MultithreadClassExtractor {
         if (line[0].equals("id"))
           continue;
 
-        WikidataEntity entity = new WikidataEntity(line[0], line[1]);
+        WikidataEntity entity;
+        if (line.length == 1) {
+          entity = new WikidataEntity(line[0]);
+        } else {
+          entity = new WikidataEntity(line[0], line[1]);
+        }
         if (line.length == 3)
           entity.setClasses(entity.deserializeClasses(line[2]));
 
@@ -142,6 +187,4 @@ public class MultithreadClassExtractor {
 
     return records;
   }
-
-
 }

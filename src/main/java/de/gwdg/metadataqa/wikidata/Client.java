@@ -13,7 +13,6 @@ import org.apache.commons.cli.HelpFormatter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Map;
 import java.util.stream.Stream;
 
 public class Client {
@@ -51,6 +50,8 @@ public class Client {
         resolveEntityClassesWithMultithread(entitiesFile);
       } else if (command.equals(Command.ENTITY_RESOLUTION)) {
         resolveEntities(parameters, propertiesFile, entitiesFile, input, command, processingLimit);
+      } else if (command.equals(Command.ENTITY_RESOLUTION_FROM_LIST)) {
+        resolveEntitiesFromList(parameters, entitiesFile, processingLimit);
       } else if (command.equals(Command.TRANSFORMATION)) {
         resolveEntities(parameters, propertiesFile, entitiesFile, input, command, processingLimit);
         // container.keySet().stream().forEach(
@@ -63,6 +64,15 @@ public class Client {
     System.err.println("duration: " + Utils.formatDuration(duration));
   }
 
+  private static void resolveEntitiesFromList(CliParameters parameters,
+                                              String entitiesFile,
+                                              int processingLimit) {
+
+    MultithreadClassExtractor extractor = new MultithreadClassExtractor(entitiesFile, 10);
+    extractor.resolveAllLabels();
+    extractor.saveEntities(entitiesFile);
+  }
+
   private static void resolveEntities(CliParameters parameters,
                                       String propertiesFile,
                                       String entitiesFile,
@@ -72,6 +82,7 @@ public class Client {
     final Reader reader;
     if (command.equals(Command.ENTITY_RESOLUTION)) {
       reader = new EntityResolver(propertiesFile, entitiesFile);
+      ((EntityResolver) reader).setSkipResolution(parameters.isSkipResolution());
     } else if (command.equals(Command.TRANSFORMATION)) {
       reader = new JsonTransformer(propertiesFile, entitiesFile);
     } else {
@@ -97,10 +108,11 @@ public class Client {
     }
 
     reader.postProcess();
-    reader.saveEntities();
+    // reader.saveEntities();
+    reader.saveState();
 
     System.err.println(reader.getRecordCounter());
-    // Map<String, Integer> container = reader.getContainer();
+    //  Map<String, Integer> container = reader.getContainer();
   }
 
   private static void resolveEntityClasses(String entitiesFile) {
@@ -111,7 +123,7 @@ public class Client {
 
   private static void resolveEntityClassesWithMultithread(String entitiesFile) {
     MultithreadClassExtractor extractor = new MultithreadClassExtractor(entitiesFile, 10);
-    extractor.resolveAll();
+    extractor.resolveAllClasses();
     extractor.saveEntities(entitiesFile);
   }
 
