@@ -88,8 +88,10 @@ public class Client {
                                       int firstRecordToProcess, int lastRecordToProcess) {
     final LineProcessor lineProcessor;
     if (command.equals(Command.ENTITY_RESOLUTION)) {
-      lineProcessor = new EntityResolver(propertiesFile, entitiesFile);
+      lineProcessor = new EntityResolver(propertiesFile, entitiesFile, parameters.getEntityBootstrapFile());
       ((EntityResolver) lineProcessor).setSkipResolution(parameters.isSkipResolution());
+      ((EntityResolver) lineProcessor).setNewEntitiesFile(parameters.getNewEntityFile());
+      ((EntityResolver) lineProcessor).initialize(!parameters.isSkipResolution());
     } else if (command.equals(Command.TRANSFORMATION)) {
       lineProcessor = new JsonTransformer(propertiesFile, entitiesFile);
     } else {

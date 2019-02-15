@@ -16,17 +16,21 @@ public class CliParameters {
     options.addOption("o", "output-file", true, "output JSON dump");
     options.addOption("p", "property-file", true, "property file");
     options.addOption("e", "entity-file", true, "entity file");
+    options.addOption("w", "new-entity-file", true, "new entity file");
     options.addOption("c", "command", true, "command");
     options.addOption("t", "first-record-to-process", true, "first record to process");
     options.addOption("l", "last-record-to-process", true, "first record to process");
-    options.addOption("h", "help", false, "help");
     options.addOption("s", "skip-resolution", false, "skip resolution (only collect statistics)");
+    options.addOption("b", "entity-bootstrap", true, "entity bootstrap file (list of entities to read in)");
+    options.addOption("h", "help", false, "help");
   }
 
   private String inputFile;
   private String outputFile;
   private String propertyFile;
   private String entityFile;
+  private String newEntityFile;
+  private String entityBootstrapFile;
   private boolean help = false;
   private Command command;
   private int firstRecordToProcess = -1;
@@ -68,6 +72,14 @@ public class CliParameters {
       lastRecordToProcess = Integer.parseInt(cmd.getOptionValue("last-record-to-process"));
     }
 
+    if (cmd.hasOption("entity-bootstrap")) {
+      entityBootstrapFile = cmd.getOptionValue("entity-bootstrap");
+    }
+
+    if (cmd.hasOption("new-entity-file")) {
+      newEntityFile = cmd.getOptionValue("new-entity-file");
+    }
+
     if (cmd.hasOption("help"))
       help = true;
 
@@ -103,6 +115,14 @@ public class CliParameters {
     return lastRecordToProcess;
   }
 
+  public String getEntityBootstrapFile() {
+    return entityBootstrapFile;
+  }
+
+  public String getNewEntityFile() {
+    return newEntityFile;
+  }
+
   public boolean showHelp() {
     return help;
   }
@@ -123,9 +143,11 @@ public class CliParameters {
       "  output-file: " + outputFile + "\n" +
       "  property-file: " + propertyFile + "\n" +
       "  entity-file: " + entityFile + "\n" +
+      "  new-entity-file: " + newEntityFile + "\n" +
       "  first-record-to-process: " + firstRecordToProcess + "\n" +
       "  last-record-to-process: " + lastRecordToProcess + "\n" +
       "  skip-resolution: " + skipResolution + "\n" +
+      "  entity-bootstrap: " + entityBootstrapFile + "\n" +
       "  help: " + help + "\n";
   }
 }

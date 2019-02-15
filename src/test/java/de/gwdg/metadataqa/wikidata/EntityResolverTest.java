@@ -37,7 +37,17 @@ public class EntityResolverTest {
       if (lines != null)
         lines.close();
     }
-
   }
+
+  @Test
+  public void testBootstrap() {
+    String propertiesFile = "data/properties.csv";
+    String entitiesFile = "data/entities-23Mb.csv";
+    String entitiesBootstrap = "entities-count.csv";
+    EntityResolver lineProcessor = new EntityResolver(propertiesFile, entitiesFile, entitiesBootstrap);
+    lineProcessor.setSkipResolution(false);
+    lineProcessor.initialize(true);
+  }
+
 
 }

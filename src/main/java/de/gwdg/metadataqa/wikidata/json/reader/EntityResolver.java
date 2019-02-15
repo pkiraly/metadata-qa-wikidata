@@ -1,5 +1,8 @@
 package de.gwdg.metadataqa.wikidata.json.reader;
 
+import de.gwdg.metadataqa.wikidata.model.Wikidata;
+import de.gwdg.metadataqa.wikidata.model.WikidataType;
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -22,6 +25,10 @@ public class EntityResolver extends Reader {
     super(propertiesFile, entitiesFile);
   }
 
+  public EntityResolver(String propertiesFile, String entitiesFile, String entitiesBootstrapFile) {
+    super(propertiesFile, entitiesFile, entitiesBootstrapFile);
+  }
+
   public void read(String jsonString) {
     read(jsonString, true);
   }
@@ -29,7 +36,7 @@ public class EntityResolver extends Reader {
   public void read(String jsonString, boolean processable) {
     recordCounter++;
 
-    if (recordCounter % 100000 == 0)
+    if (recordCounter % 10000 == 0)
       System.err.println(recordCounter);
 
     if (!processable)
@@ -64,7 +71,7 @@ public class EntityResolver extends Reader {
 
       addContainer(key);
       if (value instanceof String) {
-        String resolvedValue = resolveValue(value.toString(), skipResolution);
+        resolveValue(value.toString(), skipResolution);
       } else if (value instanceof Long) {
         //
       } else if (value instanceof Double) {
@@ -115,4 +122,12 @@ public class EntityResolver extends Reader {
   public void setSkipResolution(boolean skipResolution) {
     this.skipResolution = skipResolution;
   }
+
+  public void saveState() {
+    saveEntities();
+    saveProperties();
+    if (skipResolution)
+      saveCounter();
+  }
+
 }

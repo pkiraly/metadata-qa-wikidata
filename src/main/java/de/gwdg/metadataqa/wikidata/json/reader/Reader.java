@@ -10,6 +10,7 @@ import de.gwdg.metadataqa.wikidata.model.Wikidata;
 import de.gwdg.metadataqa.wikidata.model.WikidataEntity;
 import de.gwdg.metadataqa.wikidata.model.WikidataProperty;
 import de.gwdg.metadataqa.wikidata.model.WikidataType;
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.parser.JSONParser;
 
 import java.io.BufferedReader;
@@ -38,33 +39,59 @@ public abstract class Reader implements LineProcessor {
   private static final String API_URL_PATTERN =
     "https://www.wikidata.org/wiki/Special:EntityData/%s.json";
   public static final Charset CHARSET = Charset.forName("UTF-8");
+
   private final String propertiesFile;
   private final String entitiesFile;
-  protected Map<String, Boolean> unknownProperties = new HashMap<>();
+  private String newEntitiesFile;
+  private String entitiesBootstrapFile;
 
+  protected Map<String, Boolean> unknownProperties = new HashMap<>();
   protected static int recordCounter = 0;
   protected static JSONParser parser = new JSONParser();
-  protected Map<String, Wikidata> properties = new HashMap<>();
+
   protected Class T = String.class;
+  protected Map<String, Wikidata> properties = new HashMap<>();
   protected Map<String, String> entities = new HashMap<>();
   protected Map<String, Integer> entitiesCounter = new HashMap<>();
+
   protected int newEntitiesCount = 0;
-  // private JenaBasedSparqlClient sparqlClient = new JenaBasedSparqlClient();
-  protected LabelExtractor extractor;
+  protected Map<String, String> newEntities = new HashMap<>();
+
+  // private LabelExtractor extractor = new JenaBasedSparqlClient();
+  protected LabelExtractor extractor = new WdClient();
   private long duration = 0;
 
   protected PrintWriter out = null;
-  private CsvManager csvManager = new CsvManager();
+  protected CsvManager csvManager = new CsvManager();
 
   public Reader(String propertiesFile, String entitiesFile) {
     this.propertiesFile = propertiesFile;
     this.entitiesFile = entitiesFile;
+    initialize();
+  }
+
+  public Reader(String propertiesFile, String entitiesFile, String entitiesBootstrapFile) {
+    this.propertiesFile = propertiesFile;
+    this.entitiesFile = entitiesFile;
+    this.entitiesBootstrapFile = entitiesBootstrapFile;
+  }
+
+  public void initialize() {
+    initialize(true);
+  }
+
+  public void initialize(boolean readEntities) {
     properties = csvManager.readCsv(propertiesFile, WikidataType.PROPERTIES, Wikidata.class);
     System.err.println("properties: " + properties.size());
-    entities = csvManager.readCsv(entitiesFile, WikidataType.ENTITIES, T);
-    System.err.println("entities: " + entities.size());
-    extractor = new WdClient();
-    // extractor = new JenaBasedSparqlClient();
+
+    if (StringUtils.isNotBlank(entitiesBootstrapFile)) {
+      entitiesCounter = csvManager.readCsv(entitiesBootstrapFile, WikidataType.ENTITIES_COUNT, Integer.class);
+      csvManager.setEntitiesFilter(entitiesCounter);
+    }
+    if (readEntities) {
+      entities = csvManager.readCsv(entitiesFile, WikidataType.ENTITIES, T);
+      System.err.println("entities: " + entities.size());
+    }
   }
 
   abstract public void read(String jsonString);
@@ -119,7 +146,7 @@ public abstract class Reader implements LineProcessor {
       String entityId = value;
       if (ENTITY_ID_PATTERN.matcher(entityId).matches()) {
         if (!entities.containsKey(entityId)) {
-          // System.err.println(entityId);
+          System.err.println(entityId);
           if (extractor instanceof JenaBasedSparqlClient) {
             String label = extractor.getLabel(entityId);
             // String label = readWd(entityId);
@@ -131,6 +158,7 @@ public abstract class Reader implements LineProcessor {
             } else {
             */
               entities.put(entityId, label);
+            newEntities.put(entityId, label);
               resolvedValue = label;
             // }
           } else if (extractor instanceof WdClient) {
@@ -145,6 +173,7 @@ public abstract class Reader implements LineProcessor {
                 if (!entities.containsKey(label.getKey())) {
                   // entities.put(label.getKey(), new WikidataEntity(label.getKey(), label.getValue()));
                   entities.put(label.getKey(), label.getValue());
+                  newEntities.put(label.getKey(), label.getValue());
                 } else {
                   System.err.printf("already there %s: '%s' vs '%s'%n",
                     label.getKey(), label.getValue(), entities.get(label.getKey()));
@@ -261,7 +290,7 @@ public abstract class Reader implements LineProcessor {
       csvWriter.writeNext(new String[]{"id", "count"});
       for (Map.Entry<String, Integer> entry : entitiesCounter.entrySet()) {
         csvWriter.writeNext(
-          new String[]{entry.getKey(), entry.getValue().toString()},
+          new String[]{entry.getKey(), String.valueOf(entry.getValue())},
           false
         );
       }
@@ -282,11 +311,13 @@ public abstract class Reader implements LineProcessor {
       entities.size(),
       (duration / 1000.0)
     );
+
     duration = 0;
     long start = System.currentTimeMillis();
     FileWriter writer = null;
     try {
-      writer = new FileWriter(entitiesFile);
+      String outputFile = StringUtils.isNotBlank(newEntitiesFile) ? newEntitiesFile : entitiesFile;
+      writer = new FileWriter(outputFile);
       CSVWriter csvWriter = new CSVWriter(writer);
       csvWriter.writeNext(new String[]{"id", "label"});
       /*
@@ -294,7 +325,7 @@ public abstract class Reader implements LineProcessor {
         csvWriter.writeNext(entry.getValue().asArray());
       }
       */
-      for (Map.Entry<String, String> entry : entities.entrySet()) {
+      for (Map.Entry<String, String> entry : newEntities.entrySet()) {
         csvWriter.writeNext(new String[]{entry.getKey(), entry.getValue()});
       }
 
@@ -380,5 +411,9 @@ public abstract class Reader implements LineProcessor {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  public void setNewEntitiesFile(String newEntitiesFile) {
+    this.newEntitiesFile = newEntitiesFile;
   }
 }
