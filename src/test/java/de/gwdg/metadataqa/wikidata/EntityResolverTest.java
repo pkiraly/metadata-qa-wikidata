@@ -1,8 +1,7 @@
 package de.gwdg.metadataqa.wikidata;
 
 import de.gwdg.metadataqa.wikidata.json.BreakException;
-import de.gwdg.metadataqa.wikidata.json.EntityResolver;
-import de.gwdg.metadataqa.wikidata.json.JsonTransformer;
+import de.gwdg.metadataqa.wikidata.json.reader.EntityResolver;
 import org.junit.Test;
 
 import java.io.IOException;

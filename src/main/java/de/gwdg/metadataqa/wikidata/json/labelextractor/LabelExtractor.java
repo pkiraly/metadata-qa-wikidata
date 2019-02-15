@@ -1,4 +1,4 @@
-package de.gwdg.metadataqa.wikidata.json;
+package de.gwdg.metadataqa.wikidata.json.labelextractor;
 
 import java.util.List;
 import java.util.Map;

@@ -2,7 +2,7 @@ package de.gwdg.metadataqa.wikidata.json;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
-import de.gwdg.metadataqa.wikidata.json.labelextractor.JenaBasedSparqlClient;
+import de.gwdg.metadataqa.wikidata.json.labelextractor.LabelExtractor;
 import de.gwdg.metadataqa.wikidata.json.labelextractor.WdClient;
 import de.gwdg.metadataqa.wikidata.model.WikidataEntity;
 import org.apache.commons.lang3.StringUtils;

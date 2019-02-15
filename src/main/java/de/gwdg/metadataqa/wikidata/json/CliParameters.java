@@ -17,9 +17,10 @@ public class CliParameters {
     options.addOption("p", "property-file", true, "property file");
     options.addOption("e", "entity-file", true, "entity file");
     options.addOption("c", "command", true, "command");
-    options.addOption("l", "processing-limit", true, "command");
+    options.addOption("t", "first-record-to-process", true, "first record to process");
+    options.addOption("l", "last-record-to-process", true, "first record to process");
     options.addOption("h", "help", false, "help");
-    options.addOption("s", "skip-resolution", false, "help");
+    options.addOption("s", "skip-resolution", false, "skip resolution (only collect statistics)");
   }
 
   private String inputFile;
@@ -28,7 +29,8 @@ public class CliParameters {
   private String entityFile;
   private boolean help = false;
   private Command command;
-  private int processingLimit = 0;
+  private int firstRecordToProcess = -1;
+  private int lastRecordToProcess = -1;
   private boolean skipResolution = false;
 
   public CliParameters(String[] arguments) throws ParseException {
@@ -58,8 +60,12 @@ public class CliParameters {
       entityFile = cmd.getOptionValue("entity-file");
     }
 
-    if (cmd.hasOption("processing-limit")) {
-      processingLimit = Integer.parseInt(cmd.getOptionValue("processing-limit"));
+    if (cmd.hasOption("first-record-to-process")) {
+      firstRecordToProcess = Integer.parseInt(cmd.getOptionValue("first-record-to-process"));
+    }
+
+    if (cmd.hasOption("last-record-to-process")) {
+      lastRecordToProcess = Integer.parseInt(cmd.getOptionValue("last-record-to-process"));
     }
 
     if (cmd.hasOption("help"))
@@ -89,8 +95,12 @@ public class CliParameters {
     return command;
   }
 
-  public int getProcessingLimit() {
-    return processingLimit;
+  public int getFirstRecordToProcess() {
+    return firstRecordToProcess;
+  }
+
+  public int getLastRecordToProcess() {
+    return lastRecordToProcess;
   }
 
   public boolean showHelp() {
@@ -113,7 +123,8 @@ public class CliParameters {
       "  output-file: " + outputFile + "\n" +
       "  property-file: " + propertyFile + "\n" +
       "  entity-file: " + entityFile + "\n" +
-      "  processing-limit: " + processingLimit + "\n" +
+      "  first-record-to-process: " + firstRecordToProcess + "\n" +
+      "  last-record-to-process: " + lastRecordToProcess + "\n" +
       "  skip-resolution: " + skipResolution + "\n" +
       "  help: " + help + "\n";
   }

@@ -1,6 +1,5 @@
 package de.gwdg.metadataqa.wikidata.json.labelextractor;
 
-import de.gwdg.metadataqa.wikidata.json.LabelExtractor;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryFactory;

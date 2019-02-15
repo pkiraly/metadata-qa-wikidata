@@ -1,13 +1,15 @@
-package de.gwdg.metadataqa.wikidata.json;
+package de.gwdg.metadataqa.wikidata.json.reader;
 
 import com.opencsv.CSVWriter;
+import de.gwdg.metadataqa.wikidata.json.CsvManager;
+import de.gwdg.metadataqa.wikidata.json.Utils;
 import de.gwdg.metadataqa.wikidata.json.labelextractor.JenaBasedSparqlClient;
+import de.gwdg.metadataqa.wikidata.json.labelextractor.LabelExtractor;
 import de.gwdg.metadataqa.wikidata.json.labelextractor.WdClient;
 import de.gwdg.metadataqa.wikidata.model.Wikidata;
 import de.gwdg.metadataqa.wikidata.model.WikidataEntity;
 import de.gwdg.metadataqa.wikidata.model.WikidataProperty;
 import de.gwdg.metadataqa.wikidata.model.WikidataType;
-import org.apache.commons.lang3.StringUtils;
 import org.json.simple.parser.JSONParser;
 
 import java.io.BufferedReader;
@@ -28,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-public abstract class Reader {
+public abstract class Reader implements LineProcessor {
 
   private static final Pattern ENTITY_ID_PATTERN = Pattern.compile("^Q\\d+$");
   private static final Pattern PROPERTY_ID_PATTERN = Pattern.compile("^P\\d+$");
@@ -43,7 +45,8 @@ public abstract class Reader {
   protected static int recordCounter = 0;
   protected static JSONParser parser = new JSONParser();
   protected Map<String, Wikidata> properties = new HashMap<>();
-  protected Map<String, Wikidata> entities = new HashMap<>();
+  protected Class T = String.class;
+  protected Map<String, String> entities = new HashMap<>();
   protected Map<String, Integer> entitiesCounter = new HashMap<>();
   protected int newEntitiesCount = 0;
   // private JenaBasedSparqlClient sparqlClient = new JenaBasedSparqlClient();
@@ -56,9 +59,9 @@ public abstract class Reader {
   public Reader(String propertiesFile, String entitiesFile) {
     this.propertiesFile = propertiesFile;
     this.entitiesFile = entitiesFile;
-    properties = csvManager.readCsv(propertiesFile, WikidataType.PROPERTIES);
+    properties = csvManager.readCsv(propertiesFile, WikidataType.PROPERTIES, Wikidata.class);
     System.err.println("properties: " + properties.size());
-    entities = csvManager.readCsv(entitiesFile, WikidataType.ENTITIES);
+    entities = csvManager.readCsv(entitiesFile, WikidataType.ENTITIES, T);
     System.err.println("entities: " + entities.size());
     extractor = new WdClient();
     // extractor = new JenaBasedSparqlClient();
@@ -121,8 +124,15 @@ public abstract class Reader {
             String label = extractor.getLabel(entityId);
             // String label = readWd(entityId);
             newEntitiesCount++;
-            entities.put(entityId, new WikidataEntity(entityId, label));
-            resolvedValue = entities.get(entityId).getLabel();
+            /*
+            if (T.equals(Wikidata.class)) {
+              entities.put(entityId, new WikidataEntity(entityId, label));
+              resolvedValue = entities.get(entityId).getLabel();
+            } else {
+            */
+              entities.put(entityId, label);
+              resolvedValue = label;
+            // }
           } else if (extractor instanceof WdClient) {
             extractor.addOnHold(entityId);
             Set<String> onHold = extractor.getOnHold();
@@ -133,7 +143,8 @@ public abstract class Reader {
                   System.err.println("THIS IS THE TRIGGER");
                 }
                 if (!entities.containsKey(label.getKey())) {
-                  entities.put(label.getKey(), new WikidataEntity(label.getKey(), label.getValue()));
+                  // entities.put(label.getKey(), new WikidataEntity(label.getKey(), label.getValue()));
+                  entities.put(label.getKey(), label.getValue());
                 } else {
                   System.err.printf("already there %s: '%s' vs '%s'%n",
                     label.getKey(), label.getValue(), entities.get(label.getKey()));
@@ -141,11 +152,13 @@ public abstract class Reader {
               }
               newEntitiesCount += labels.size();
               extractor.clearOnHold();
-              resolvedValue = entities.get(entityId).getLabel();
+              // resolvedValue = entities.get(entityId).getLabel();
+              resolvedValue = entities.get(entityId);
             }
           }
         } else {
-          resolvedValue = entities.get(entityId).getLabel();
+          // resolvedValue = entities.get(entityId).getLabel();
+          resolvedValue = entities.get(entityId);
         }
       }
       duration += (System.currentTimeMillis() - start);
@@ -160,7 +173,7 @@ public abstract class Reader {
     // return path.equals("/") ? "/" + key : String.format("%s/%s", path, key);
   }
 
-  public static int getRecordCounter() {
+  public int getRecordCounter() {
     return recordCounter;
   }
 
@@ -220,8 +233,11 @@ public abstract class Reader {
       if (onHold.size() > 0) {
         int i = 0;
         for (Map.Entry<String, String> label : extractor.getLabels(new ArrayList<>(onHold)).entrySet()) {
+          /*
           entities.put(label.getKey(),
             new WikidataEntity(label.getKey(), label.getValue()));
+          */
+          entities.put(label.getKey(), label.getValue());
           i++;
         }
         newEntitiesCount += i;
@@ -273,9 +289,15 @@ public abstract class Reader {
       writer = new FileWriter(entitiesFile);
       CSVWriter csvWriter = new CSVWriter(writer);
       csvWriter.writeNext(new String[]{"id", "label"});
+      /*
       for (Map.Entry<String, Wikidata> entry : entities.entrySet()) {
         csvWriter.writeNext(entry.getValue().asArray());
       }
+      */
+      for (Map.Entry<String, String> entry : entities.entrySet()) {
+        csvWriter.writeNext(new String[]{entry.getKey(), entry.getValue()});
+      }
+
       csvWriter.close();
     } catch (IOException e) {
       e.printStackTrace();
@@ -333,8 +355,14 @@ public abstract class Reader {
     // adding header record
     records.add(new String[]{"id", "label"});
 
+    /*
     for (Map.Entry<String, Wikidata> entry : entities.entrySet()) {
       records.add(entry.getValue().asArray());
+    }
+    */
+
+    for (Map.Entry<String, String> entry : entities.entrySet()) {
+      records.add(new String[]{entry.getKey(), entry.getValue()});
     }
 
     return records;

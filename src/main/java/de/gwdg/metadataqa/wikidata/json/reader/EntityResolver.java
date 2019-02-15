@@ -1,4 +1,4 @@
-package de.gwdg.metadataqa.wikidata.json;
+package de.gwdg.metadataqa.wikidata.json.reader;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -23,10 +23,18 @@ public class EntityResolver extends Reader {
   }
 
   public void read(String jsonString) {
+    read(jsonString, true);
+  }
+
+  public void read(String jsonString, boolean processable) {
     recordCounter++;
 
     if (recordCounter % 100000 == 0)
       System.err.println(recordCounter);
+
+    if (!processable)
+      return;
+
     try {
       processObject("", (JSONObject) parser.parse(jsonString));
     } catch (ParseException e) {

@@ -3,10 +3,11 @@ package de.gwdg.metadataqa.wikidata;
 import de.gwdg.metadataqa.wikidata.json.BreakException;
 import de.gwdg.metadataqa.wikidata.json.ClassExtractor;
 import de.gwdg.metadataqa.wikidata.json.CliParameters;
-import de.gwdg.metadataqa.wikidata.json.EntityResolver;
-import de.gwdg.metadataqa.wikidata.json.JsonTransformer;
+import de.gwdg.metadataqa.wikidata.json.reader.EntityResolver;
+import de.gwdg.metadataqa.wikidata.json.reader.FileBasedLabelExtractor;
+import de.gwdg.metadataqa.wikidata.json.reader.JsonTransformer;
 import de.gwdg.metadataqa.wikidata.json.MultithreadClassExtractor;
-import de.gwdg.metadataqa.wikidata.json.Reader;
+import de.gwdg.metadataqa.wikidata.json.reader.LineProcessor;
 import de.gwdg.metadataqa.wikidata.json.Utils;
 import org.apache.commons.cli.HelpFormatter;
 
@@ -41,7 +42,10 @@ public class Client {
     String input = parameters.getInputFile();
     final Command command = parameters.getCommand();
 
-    int processingLimit = parameters.getProcessingLimit();
+    int firstRecordToProcess = parameters.getFirstRecordToProcess();
+    int lastRecordToProcess = parameters.getLastRecordToProcess();
+
+    System.err.println("command: " + command);
 
     if (command != null) {
       if (command.equals(Command.ENTITY_CLASS_RESOLUTION)) {
@@ -49,14 +53,16 @@ public class Client {
       } else if (command.equals(Command.ENTITY_CLASS_RESOLUTION_MULTITHREAD)) {
         resolveEntityClassesWithMultithread(entitiesFile);
       } else if (command.equals(Command.ENTITY_RESOLUTION)) {
-        resolveEntities(parameters, propertiesFile, entitiesFile, input, command, processingLimit);
+        resolveEntities(parameters, propertiesFile, entitiesFile, input, command, firstRecordToProcess, lastRecordToProcess);
       } else if (command.equals(Command.ENTITY_RESOLUTION_FROM_LIST)) {
-        resolveEntitiesFromList(parameters, entitiesFile, processingLimit);
+        resolveEntitiesFromList(parameters, entitiesFile, firstRecordToProcess, lastRecordToProcess);
       } else if (command.equals(Command.TRANSFORMATION)) {
-        resolveEntities(parameters, propertiesFile, entitiesFile, input, command, processingLimit);
+        resolveEntities(parameters, propertiesFile, entitiesFile, input, command, firstRecordToProcess, lastRecordToProcess);
         // container.keySet().stream().forEach(
         //   s -> System.out.printf("%s: %d\n", s, container.get(s))
         // );
+      } else if (command.equals(Command.EXTRACT_LABELS_FROM_FILE)) {
+        extractLabelsFromFile(parameters, input, firstRecordToProcess);
       }
     }
 
@@ -66,7 +72,8 @@ public class Client {
 
   private static void resolveEntitiesFromList(CliParameters parameters,
                                               String entitiesFile,
-                                              int processingLimit) {
+                                              int firstRecordToProcess,
+                                              int lastRecordToProcess) {
 
     MultithreadClassExtractor extractor = new MultithreadClassExtractor(entitiesFile, 10);
     extractor.resolveAllLabels();
@@ -78,25 +85,45 @@ public class Client {
                                       String entitiesFile,
                                       String input,
                                       Command command,
-                                      int processingLimit) {
-    final Reader reader;
+                                      int firstRecordToProcess, int lastRecordToProcess) {
+    final LineProcessor lineProcessor;
     if (command.equals(Command.ENTITY_RESOLUTION)) {
-      reader = new EntityResolver(propertiesFile, entitiesFile);
-      ((EntityResolver) reader).setSkipResolution(parameters.isSkipResolution());
+      lineProcessor = new EntityResolver(propertiesFile, entitiesFile);
+      ((EntityResolver) lineProcessor).setSkipResolution(parameters.isSkipResolution());
     } else if (command.equals(Command.TRANSFORMATION)) {
-      reader = new JsonTransformer(propertiesFile, entitiesFile);
+      lineProcessor = new JsonTransformer(propertiesFile, entitiesFile);
     } else {
-      reader = null;
+      lineProcessor = null;
     }
-    reader.setOutputFileName(parameters.getOutputFile());
+    lineProcessor.setOutputFileName(parameters.getOutputFile());
+
+    iterateOverLines(input, lineProcessor, firstRecordToProcess, lastRecordToProcess);
+    //  Map<String, Integer> container = lineProcessor.getContainer();
+  }
+
+  private static void extractLabelsFromFile(CliParameters parameters,
+                                      String input,
+                                      int firstRecordToProcess) {
+    final LineProcessor lineProcessor = new FileBasedLabelExtractor();
+    lineProcessor.setOutputFileName(parameters.getOutputFile());
+
+    iterateOverLines(input, lineProcessor, firstRecordToProcess, -1);
+  }
+
+  private static void iterateOverLines(String input,
+                                       LineProcessor lineProcessor,
+                                       int firstRecordToProcess,
+                                       int lastRecordToProcess) {
 
     Stream<String> lines = null;
     try {
       lines = Files.lines(Paths.get(input));
       lines.forEach(item -> {
-        reader.read(item);
-        if (processingLimit != 0
-          && reader.getRecordCounter() == processingLimit)
+        boolean cond1 = firstRecordToProcess == -1 || lineProcessor.getRecordCounter() >= firstRecordToProcess;
+        boolean cond2 = lastRecordToProcess == -1 || lineProcessor.getRecordCounter() <= lastRecordToProcess;
+
+        lineProcessor.read(item, (cond1 && cond2));
+        if (!cond2)
           throw new BreakException();
       });
     } catch (IOException e) {
@@ -107,12 +134,10 @@ public class Client {
         lines.close();
     }
 
-    reader.postProcess();
-    // reader.saveEntities();
-    reader.saveState();
+    lineProcessor.postProcess();
+    lineProcessor.saveState();
 
-    System.err.println(reader.getRecordCounter());
-    //  Map<String, Integer> container = reader.getContainer();
+    System.err.println(lineProcessor.getRecordCounter());
   }
 
   private static void resolveEntityClasses(String entitiesFile) {

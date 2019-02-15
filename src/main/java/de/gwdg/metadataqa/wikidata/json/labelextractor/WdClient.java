@@ -1,7 +1,5 @@
 package de.gwdg.metadataqa.wikidata.json.labelextractor;
 
-import de.gwdg.metadataqa.wikidata.json.LabelExtractor;
-import de.gwdg.metadataqa.wikidata.json.Utils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;

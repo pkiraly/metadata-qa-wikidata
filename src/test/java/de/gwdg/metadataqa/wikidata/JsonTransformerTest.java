@@ -1,7 +1,7 @@
 package de.gwdg.metadataqa.wikidata;
 
 import de.gwdg.metadataqa.wikidata.json.BreakException;
-import de.gwdg.metadataqa.wikidata.json.JsonTransformer;
+import de.gwdg.metadataqa.wikidata.json.reader.JsonTransformer;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -14,8 +14,8 @@ public class JsonTransformerTest {
   @Test
   public void test() {
     String propertiesFile = "data/properties.csv";
-    String entitiesFile = "data/entities-12M.csv";
-    // String entitiesFile = "src/test/resources/entities.csv";
+    // String entitiesFile = "data/entities-12M.csv";
+    String entitiesFile = "src/test/resources/entities-1K.csv";
     String inputFile = "src/test/resources/10-records.json";
     String outputFile = "src/test/resources/10-records-transformed.json";
     JsonTransformer transformer = new JsonTransformer(propertiesFile, entitiesFile);
