@@ -55,7 +55,7 @@ public class CsvManager {
           list.put(id, (T)label);
         }
         lineNumber++;
-        if (lineNumber % 100000 == 0)
+        if (lineNumber % 1000000 == 0)
           System.err.printf("%,d / %,d - %s%n", list.size(), lineNumber, id);
       }
     } catch (IOException e) {

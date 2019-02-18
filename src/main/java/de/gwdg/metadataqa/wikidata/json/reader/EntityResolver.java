@@ -36,7 +36,7 @@ public class EntityResolver extends Reader {
   public void read(String jsonString, boolean processable) {
     recordCounter++;
 
-    if (recordCounter % 10000 == 0)
+    if (recordCounter % 100000 == 0)
       System.err.println(recordCounter);
 
     if (!processable)

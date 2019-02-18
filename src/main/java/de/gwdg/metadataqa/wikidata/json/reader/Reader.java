@@ -157,9 +157,9 @@ public abstract class Reader implements LineProcessor {
               resolvedValue = entities.get(entityId).getLabel();
             } else {
             */
-              entities.put(entityId, label);
+            entities.put(entityId, label);
             newEntities.put(entityId, label);
-              resolvedValue = label;
+            resolvedValue = label;
             // }
           } else if (extractor instanceof WdClient) {
             extractor.addOnHold(entityId);
@@ -267,6 +267,7 @@ public abstract class Reader implements LineProcessor {
             new WikidataEntity(label.getKey(), label.getValue()));
           */
           entities.put(label.getKey(), label.getValue());
+          newEntities.put(label.getKey(), label.getValue());
           i++;
         }
         newEntitiesCount += i;
