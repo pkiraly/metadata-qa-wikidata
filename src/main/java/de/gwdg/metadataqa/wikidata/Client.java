@@ -9,6 +9,7 @@ import de.gwdg.metadataqa.wikidata.json.reader.JsonTransformer;
 import de.gwdg.metadataqa.wikidata.json.MultithreadClassExtractor;
 import de.gwdg.metadataqa.wikidata.json.reader.LineProcessor;
 import de.gwdg.metadataqa.wikidata.json.Utils;
+import de.gwdg.metadataqa.wikidata.json.reader.PageValidationProcessor;
 import org.apache.commons.cli.HelpFormatter;
 
 import java.io.IOException;
@@ -35,34 +36,35 @@ public class Client {
       System.exit(1);
     }
 
-    System.out.println(parameters.toString());
+    System.err.println(parameters.toString());
 
-    String propertiesFile = parameters.getPropertyFile();
-    String entitiesFile = parameters.getEntityFile();
-    String input = parameters.getInputFile();
+    String entityFile = parameters.getEntityFile();
     final Command command = parameters.getCommand();
-
-    int firstRecordToProcess = parameters.getFirstRecordToProcess();
-    int lastRecordToProcess = parameters.getLastRecordToProcess();
 
     System.err.println("command: " + command);
 
     if (command != null) {
-      if (command.equals(Command.ENTITY_CLASS_RESOLUTION)) {
-        resolveEntityClasses(entitiesFile);
-      } else if (command.equals(Command.ENTITY_CLASS_RESOLUTION_MULTITHREAD)) {
-        resolveEntityClassesWithMultithread(entitiesFile);
-      } else if (command.equals(Command.ENTITY_RESOLUTION)) {
-        resolveEntities(parameters, propertiesFile, entitiesFile, input, command, firstRecordToProcess, lastRecordToProcess);
-      } else if (command.equals(Command.ENTITY_RESOLUTION_FROM_LIST)) {
-        resolveEntitiesFromList(parameters, entitiesFile, firstRecordToProcess, lastRecordToProcess);
-      } else if (command.equals(Command.TRANSFORMATION)) {
-        resolveEntities(parameters, propertiesFile, entitiesFile, input, command, firstRecordToProcess, lastRecordToProcess);
-        // container.keySet().stream().forEach(
-        //   s -> System.out.printf("%s: %d\n", s, container.get(s))
-        // );
-      } else if (command.equals(Command.EXTRACT_LABELS_FROM_FILE)) {
-        extractLabelsFromFile(parameters, input, firstRecordToProcess);
+      switch (command) {
+        case ENTITY_CLASS_RESOLUTION:
+          resolveEntityClasses(entityFile);
+          break;
+
+        case ENTITY_CLASS_RESOLUTION_MULTITHREAD:
+          resolveEntityClassesWithMultithread(entityFile);
+          break;
+
+        case ENTITY_RESOLUTION_FROM_LIST:
+          resolveEntitiesFromList(entityFile);
+          break;
+
+        case ENTITY_RESOLUTION:
+        case TRANSFORMATION:
+        case EXTRACT_LABELS_FROM_FILE:
+          processEntities(parameters, command);
+          break;
+
+        default:
+          break;
       }
     }
 
@@ -70,56 +72,54 @@ public class Client {
     System.err.println("duration: " + Utils.formatDuration(duration));
   }
 
-  private static void resolveEntitiesFromList(CliParameters parameters,
-                                              String entitiesFile,
-                                              int firstRecordToProcess,
-                                              int lastRecordToProcess) {
+  private static void resolveEntitiesFromList(String entitiesFile) {
 
     MultithreadClassExtractor extractor = new MultithreadClassExtractor(entitiesFile, 10);
     extractor.resolveAllLabels();
     extractor.saveEntities(entitiesFile);
   }
 
-  private static void resolveEntities(CliParameters parameters,
-                                      String propertiesFile,
-                                      String entitiesFile,
-                                      String input,
-                                      Command command,
-                                      int firstRecordToProcess, int lastRecordToProcess) {
+  private static void processEntities(CliParameters parameters,
+                                      Command command) {
     final LineProcessor lineProcessor;
     if (command.equals(Command.ENTITY_RESOLUTION)) {
-      lineProcessor = new EntityResolver(propertiesFile, entitiesFile, parameters.getEntityBootstrapFile());
-      ((EntityResolver) lineProcessor).setSkipResolution(parameters.isSkipResolution());
+      lineProcessor = new EntityResolver(
+        parameters.getPropertyFile(), parameters.getEntityFile(),
+        parameters.getEntityBootstrapFile()
+      );
+      ((EntityResolver) lineProcessor).setSkipResolution(parameters.skipResolution());
       ((EntityResolver) lineProcessor).setNewEntitiesFile(parameters.getNewEntityFile());
-      ((EntityResolver) lineProcessor).initialize(!parameters.isSkipResolution());
+      ((EntityResolver) lineProcessor).initialize(!parameters.skipResolution());
     } else if (command.equals(Command.TRANSFORMATION)) {
-      lineProcessor = new JsonTransformer(propertiesFile, entitiesFile);
+      lineProcessor = new JsonTransformer(
+        parameters.getPropertyFile(), parameters.getEntityFile()
+      );
+    } else if (command.equals(Command.EXTRACT_LABELS_FROM_FILE)) {
+      lineProcessor = new FileBasedLabelExtractor();
+      lineProcessor.setOutputFileName(parameters.getOutputFile());
+    } else if (command.equals(Command.PAGE_VALIDATION)) {
+      lineProcessor = new PageValidationProcessor(parameters.getOutputFile(), parameters.getEntityFile());
     } else {
       lineProcessor = null;
     }
     lineProcessor.setOutputFileName(parameters.getOutputFile());
 
-    iterateOverLines(input, lineProcessor, firstRecordToProcess, lastRecordToProcess);
-    //  Map<String, Integer> container = lineProcessor.getContainer();
+    iterateOverLines(
+      parameters.getOutputFile(),
+      lineProcessor,
+      parameters.getFirstRecordToProcess(),
+      parameters.getLastRecordToProcess()
+    );
   }
 
-  private static void extractLabelsFromFile(CliParameters parameters,
-                                      String input,
-                                      int firstRecordToProcess) {
-    final LineProcessor lineProcessor = new FileBasedLabelExtractor();
-    lineProcessor.setOutputFileName(parameters.getOutputFile());
-
-    iterateOverLines(input, lineProcessor, firstRecordToProcess, -1);
-  }
-
-  private static void iterateOverLines(String input,
+  private static void iterateOverLines(String inputFileName,
                                        LineProcessor lineProcessor,
                                        int firstRecordToProcess,
                                        int lastRecordToProcess) {
 
     Stream<String> lines = null;
     try {
-      lines = Files.lines(Paths.get(input));
+      lines = Files.lines(Paths.get(inputFileName));
       lines.forEach(item -> {
         boolean cond1 = firstRecordToProcess == -1 || lineProcessor.getRecordCounter() >= firstRecordToProcess;
         boolean cond2 = lastRecordToProcess == -1 || lineProcessor.getRecordCounter() <= lastRecordToProcess;

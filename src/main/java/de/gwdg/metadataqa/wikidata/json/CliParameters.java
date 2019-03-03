@@ -131,7 +131,7 @@ public class CliParameters {
     return options;
   }
 
-  public boolean isSkipResolution() {
+  public boolean skipResolution() {
     return skipResolution;
   }
 

@@ -7,7 +7,6 @@ import de.gwdg.metadataqa.wikidata.json.labelextractor.JenaBasedSparqlClient;
 import de.gwdg.metadataqa.wikidata.json.labelextractor.LabelExtractor;
 import de.gwdg.metadataqa.wikidata.json.labelextractor.WdClient;
 import de.gwdg.metadataqa.wikidata.model.Wikidata;
-import de.gwdg.metadataqa.wikidata.model.WikidataEntity;
 import de.gwdg.metadataqa.wikidata.model.WikidataProperty;
 import de.gwdg.metadataqa.wikidata.model.WikidataType;
 import org.apache.commons.lang3.StringUtils;
@@ -52,7 +51,7 @@ public abstract class Reader implements LineProcessor {
   protected Class T = String.class;
   protected Map<String, Wikidata> properties = new HashMap<>();
   protected Map<String, String> entities = new HashMap<>();
-  protected Map<String, Integer> entitiesCounter = new HashMap<>();
+  protected Map<String, Integer> entityCounter = new HashMap<>();
 
   protected int newEntitiesCount = 0;
   protected Map<String, String> newEntities = new HashMap<>();
@@ -85,8 +84,8 @@ public abstract class Reader implements LineProcessor {
     System.err.println("properties: " + properties.size());
 
     if (StringUtils.isNotBlank(entitiesBootstrapFile)) {
-      entitiesCounter = csvManager.readCsv(entitiesBootstrapFile, WikidataType.ENTITIES_COUNT, Integer.class);
-      csvManager.setEntitiesFilter(entitiesCounter);
+      entityCounter = csvManager.readCsv(entitiesBootstrapFile, WikidataType.ENTITIES_COUNT, Integer.class);
+      csvManager.setEntitiesFilter(entityCounter);
     }
     if (readEntities) {
       entities = csvManager.readCsv(entitiesFile, WikidataType.ENTITIES, T);
@@ -132,10 +131,10 @@ public abstract class Reader implements LineProcessor {
   protected void countValues(String value) {
     String entityId = value;
     if (ENTITY_ID_PATTERN.matcher(entityId).matches()) {
-      if (!entitiesCounter.containsKey(entityId)) {
-        entitiesCounter.put(entityId, 0);
+      if (!entityCounter.containsKey(entityId)) {
+        entityCounter.put(entityId, 0);
       }
-      entitiesCounter.put(entityId, entitiesCounter.get(entityId) + 1);
+      entityCounter.put(entityId, entityCounter.get(entityId) + 1);
     }
   }
 
@@ -280,21 +279,38 @@ public abstract class Reader implements LineProcessor {
   public void saveState() {
     saveEntities();
     saveProperties();
-    saveCounter();
+    saveEntityCounter();
   }
 
-  public void saveCounter() {
+  public void saveEntityCounter() {
+    saveCounter(entityCounter, "entities-count.csv");
+  }
+
+  public void saveCounter(Map<String, Integer> counter, String fileName) {
     FileWriter writer = null;
     try {
-      writer = new FileWriter("entities-count.csv");
+      writer = new FileWriter(fileName);
       CSVWriter csvWriter = new CSVWriter(writer);
       csvWriter.writeNext(new String[]{"id", "count"});
-      for (Map.Entry<String, Integer> entry : entitiesCounter.entrySet()) {
+
+      counter
+        .entrySet()
+        .stream()
+        .sorted(Map.Entry.comparingByValue())
+        .forEach(
+          (Map.Entry<String, Integer> entry) -> csvWriter.writeNext(
+            new String[]{entry.getKey(), String.valueOf(entry.getValue())},
+            false
+          )
+        );
+      /*
+      for (Map.Entry<String, Integer> entry : sorted.entrySet()) {
         csvWriter.writeNext(
           new String[]{entry.getKey(), String.valueOf(entry.getValue())},
           false
         );
       }
+      */
       csvWriter.close();
     } catch (IOException e) {
       e.printStackTrace();

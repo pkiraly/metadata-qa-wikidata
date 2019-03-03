@@ -1,13 +1,11 @@
 package de.gwdg.metadataqa.wikidata.json.reader;
 
-import de.gwdg.metadataqa.wikidata.model.Wikidata;
-import de.gwdg.metadataqa.wikidata.model.WikidataType;
-import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,9 +15,11 @@ import java.util.Map;
 public class EntityResolver extends Reader {
 
   private static JSONParser parser = new JSONParser();
-  private static Map<String, Integer> container = new HashMap<>();
+  private static Map<String, Integer> propertyCounter = new HashMap<>();
+  private static Map<String, Integer> objectCounter = new HashMap<>();
   private static List<String> rootProperties = Arrays.asList("labels", "descriptions", "aliases", "sitelinks");
   private boolean skipResolution = false;
+  private DecimalFormat myFormatter = new DecimalFormat("### ### ###");
 
   public EntityResolver(String propertiesFile, String entitiesFile) {
     super(propertiesFile, entitiesFile);
@@ -37,7 +37,7 @@ public class EntityResolver extends Reader {
     recordCounter++;
 
     if (recordCounter % 100000 == 0)
-      System.err.println(recordCounter);
+      System.err.println(myFormatter.format(recordCounter));
 
     if (!processable)
       return;
@@ -69,7 +69,7 @@ public class EntityResolver extends Reader {
       Object value = jsonObject.get(keyObj);
       String resolvedProperty = resolveProperty(key);
 
-      addContainer(key);
+      countProperty(key);
       if (value instanceof String) {
         resolveValue(value.toString(), skipResolution);
       } else if (value instanceof Long) {
@@ -94,9 +94,9 @@ public class EntityResolver extends Reader {
       if (item instanceof String) {
         resolveValue(item.toString(), skipResolution);
       } else if (item instanceof Long) {
-        // addContainer(path, "Long");
+        // countProperty(path, "Long");
       } else if (item instanceof Double) {
-        // addContainer(path, "Double");
+        // countProperty(path, "Double");
       } else if (item instanceof JSONArray) {
         processArray(parent, (JSONArray)item);
       } else if (item instanceof JSONObject) {
@@ -107,16 +107,26 @@ public class EntityResolver extends Reader {
     }
   }
 
-  protected static void addContainer(String key) {
-    String typedKey = key;
-    if (!container.containsKey(typedKey)) {
-      container.put(typedKey, 0);
+  protected static void countProperty(String key) {
+    if (!propertyCounter.containsKey(key)) {
+      propertyCounter.put(key, 0);
     }
-    container.put(typedKey, container.get(typedKey) + 1);
+    propertyCounter.put(key, propertyCounter.get(key) + 1);
   }
 
-  public static Map<String, Integer> getContainer() {
-    return container;
+  protected static void countObject(String key) {
+    if (!objectCounter.containsKey(key)) {
+      objectCounter.put(key, 0);
+    }
+    objectCounter.put(key, objectCounter.get(key) + 1);
+  }
+
+  public static Map<String, Integer> getPropertyCounter() {
+    return propertyCounter;
+  }
+
+  public static Map<String, Integer> getObjectCounter() {
+    return propertyCounter;
   }
 
   public void setSkipResolution(boolean skipResolution) {
@@ -126,8 +136,13 @@ public class EntityResolver extends Reader {
   public void saveState() {
     saveEntities();
     saveProperties();
-    if (skipResolution)
-      saveCounter();
+    if (skipResolution) {
+      saveEntityCounter();
+      savePropertyCounter();
+    }
   }
 
+  public void savePropertyCounter() {
+    saveCounter(propertyCounter, "properties-count.csv");
+  }
 }

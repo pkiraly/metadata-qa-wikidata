@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class CsvManager {
 
-  private Map<String, Integer> entitiesFilter = null;
+  private Map<String, ? extends Object> entitiesFilter = null;
 
   public <T> Map<String, T> readCsv(String csvFile, WikidataType type, Class<T> clazz) {
     Map<String, T> list = new HashMap<>();
@@ -29,8 +29,17 @@ public class CsvManager {
       String id;
       String label;
       while ((line = reader.readNext()) != null) {
+        lineNumber++;
+        if (line[0].equals(""))
+          continue;
+
         id = line[0];
-        label = line[1];
+        if (line.length > 1) {
+          label = line[1];
+        } else {
+          System.err.println("Strange line: \n" + StringUtils.join(line, " -- "));
+          label = "";
+        }
         if (type.equals(WikidataType.PROPERTIES)) {
           WikidataProperty property;
           if (line.length == 2) {
@@ -54,7 +63,6 @@ public class CsvManager {
         } else if (type.equals(WikidataType.ENTITIES_COUNT)) {
           list.put(id, (T)label);
         }
-        lineNumber++;
         if (lineNumber % 1000000 == 0)
           System.err.printf("%,d / %,d - %s%n", list.size(), lineNumber, id);
       }
@@ -71,7 +79,7 @@ public class CsvManager {
     return list;
   }
 
-  public void setEntitiesFilter(Map<String, Integer> entitiesCounter) {
+  public void setEntitiesFilter(Map<String, ? extends Object> entitiesCounter) {
     this.entitiesFilter = entitiesCounter;
   }
 }

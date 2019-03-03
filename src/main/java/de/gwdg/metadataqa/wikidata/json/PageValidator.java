@@ -17,7 +17,7 @@ public class PageValidator {
     return validatePageNumbers(pageNumbers);
   }
 
-  private boolean validatePageNumbers(String pageNumbers) throws InvalidPageNumberException {
+  public boolean validatePageNumbers(String pageNumbers) throws InvalidPageNumberException {
     PageNumberErrorType error = null;
     Matcher matcher = TWO_NUMBERS_PATTERN.matcher(pageNumbers);
     String shortened = pageNumbers;
@@ -27,10 +27,14 @@ public class PageValidator {
       if (page2.length() < page1.length()) {
         error = PageNumberErrorType.SHORTER_SECOND_NUMBER;
       } else {
-        int p1 = Integer.parseInt(page1);
-        int p2 = Integer.parseInt(page2);
-        if (p2 < p1) {
-          error = PageNumberErrorType.SMALLER_SECOND_NUMBER;
+        try {
+          int p1 = Integer.parseInt(page1);
+          int p2 = Integer.parseInt(page2);
+          if (p2 < p1) {
+            error = PageNumberErrorType.SMALLER_SECOND_NUMBER;
+          }
+        } catch (NumberFormatException e) {
+          error = PageNumberErrorType.NUMBER_FORMAT;
         }
       }
     } else {
