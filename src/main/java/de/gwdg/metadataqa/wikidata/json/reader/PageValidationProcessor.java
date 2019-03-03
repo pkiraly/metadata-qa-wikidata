@@ -23,7 +23,7 @@ import java.util.Map;
 public class PageValidationProcessor implements LineProcessor {
 
   private final String entitiesFile;
-  private final String outputFile;
+  private String outputFile;
   private PageValidator validator = new PageValidator();
   private Map<String, JournalCounter> journalCounter = new HashMap<>();
   private boolean report = false;
@@ -32,26 +32,37 @@ public class PageValidationProcessor implements LineProcessor {
   private int recordCounter = 0;
   private DecimalFormat myFormatter = new DecimalFormat("###,###.###");
 
-  public PageValidationProcessor(String outputFile, String entitiesFile) {
-    this.outputFile = outputFile;
+  public PageValidationProcessor(String entitiesFile) {
     this.entitiesFile = entitiesFile;
   }
 
   @Override
   public void setOutputFileName(String fileName) {
-
+    this.outputFile = fileName;
   }
 
   @Override
   public void read(String line) {
+    read(line, true);
+  }
+
+  @Override
+  public void read(String line, boolean processable) {
+    // System.err.println('+');
     recordCounter++;
     if (recordCounter % 100000 == 0)
       System.err.println(myFormatter.format(recordCounter));
+
+    if (!processable) {
+      // System.err.print('.');
+      return;
+    }
 
     DocumentContext context = JsonPath.parse(line);
 
     Object pageObject = getPath(context, "$.claims.P304");
     if (pageObject == null) {
+      // System.err.println("no page");
       return;
     }
 
@@ -120,10 +131,6 @@ public class PageValidationProcessor implements LineProcessor {
     return value;
   }
 
-  @Override
-  public void read(String line, boolean processable) {
-
-  }
 
   @Override
   public int getRecordCounter() {

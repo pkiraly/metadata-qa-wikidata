@@ -60,10 +60,12 @@ public class Client {
         case ENTITY_RESOLUTION:
         case TRANSFORMATION:
         case EXTRACT_LABELS_FROM_FILE:
+        case PAGE_VALIDATION:
           processEntities(parameters, command);
           break;
 
         default:
+          System.err.println("Unhandled command: " + command);
           break;
       }
     }
@@ -98,14 +100,15 @@ public class Client {
       lineProcessor = new FileBasedLabelExtractor();
       lineProcessor.setOutputFileName(parameters.getOutputFile());
     } else if (command.equals(Command.PAGE_VALIDATION)) {
-      lineProcessor = new PageValidationProcessor(parameters.getOutputFile(), parameters.getEntityFile());
+      lineProcessor = new PageValidationProcessor(parameters.getEntityFile());
+      lineProcessor.setOutputFileName(parameters.getOutputFile());
     } else {
       lineProcessor = null;
     }
     lineProcessor.setOutputFileName(parameters.getOutputFile());
 
     iterateOverLines(
-      parameters.getOutputFile(),
+      parameters.getInputFile(),
       lineProcessor,
       parameters.getFirstRecordToProcess(),
       parameters.getLastRecordToProcess()
@@ -117,20 +120,28 @@ public class Client {
                                        int firstRecordToProcess,
                                        int lastRecordToProcess) {
 
+    System.err.println("START!" + lineProcessor.getClass());
+    System.err.println("inputFileName: " + inputFileName);
     Stream<String> lines = null;
     try {
       lines = Files.lines(Paths.get(inputFileName));
       lines.forEach(item -> {
+        // System.err.print('.');
         boolean cond1 = firstRecordToProcess == -1 || lineProcessor.getRecordCounter() >= firstRecordToProcess;
         boolean cond2 = lastRecordToProcess == -1 || lineProcessor.getRecordCounter() <= lastRecordToProcess;
 
         lineProcessor.read(item, (cond1 && cond2));
-        if (!cond2)
+        if (!cond2) {
+          System.err.println("BREAK");
           throw new BreakException();
+        }
       });
     } catch (IOException e) {
       e.printStackTrace();
     } catch (BreakException e) {
+      e.printStackTrace();
+    } catch (Exception e) {
+      e.printStackTrace();
     } finally {
       if (lines != null)
         lines.close();

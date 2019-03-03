@@ -39,7 +39,7 @@ public class EntityResolverTest {
     }
   }
 
-  @Test
+  // @Test
   public void testBootstrap() {
     String propertiesFile = "data/properties.csv";
     String entitiesFile = "data/entities-23Mb.csv";
@@ -48,6 +48,4 @@ public class EntityResolverTest {
     lineProcessor.setSkipResolution(false);
     lineProcessor.initialize(true);
   }
-
-
 }

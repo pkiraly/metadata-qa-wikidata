@@ -17,17 +17,19 @@ public class PageValidationProcessorTest {
   @Test
   public void test() {
     String inputFile = "src/test/resources/10-records-with-page-numbers.json";
+    String entitiesFile = "src/test/resources/entities-for-journal-test.csv";
+
     // String inputFile = "/media/kiru/Elements/projects/wikidata/prefix-01";
     // String inputFile = "/media/kiru/Elements/projects/wikidata/wikidata-20190128-publications.ndjson";
     // String entitiesFile = "data/entities-23Mb.csv";
-    String entitiesFile = "src/test/resources/entities-for-journal-test.csv";
     String outputFile = "src/test/resources/pages-per-journals-test.txt";
 
     Path path = Paths.get(outputFile);
     deleteOutput(path);
     assertFalse(Files.exists(path));
 
-    PageValidationProcessor processor = new PageValidationProcessor(outputFile, entitiesFile);
+    PageValidationProcessor processor = new PageValidationProcessor(entitiesFile);
+    processor.setOutputFileName(outputFile);
     int processingLimit = 0;
 
     Stream<String> lines = null;
