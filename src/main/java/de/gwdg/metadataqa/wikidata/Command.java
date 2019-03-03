@@ -11,5 +11,6 @@ public enum Command {
   COUNT_PROPERTIES,
   COUNT_OBJECTS,
   PAGE_VALIDATION,
+  TYPE_STATISTIC,
   ;
 }

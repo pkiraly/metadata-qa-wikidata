@@ -2,10 +2,10 @@ package de.gwdg.metadataqa.wikidata.json.reader;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.PathNotFoundException;
 import de.gwdg.metadataqa.wikidata.json.CsvManager;
 import de.gwdg.metadataqa.wikidata.json.InvalidPageNumberException;
 import de.gwdg.metadataqa.wikidata.json.PageValidator;
+import de.gwdg.metadataqa.wikidata.json.Utils;
 import de.gwdg.metadataqa.wikidata.model.JournalCounter;
 import de.gwdg.metadataqa.wikidata.model.WikidataType;
 import net.minidev.json.JSONArray;
@@ -19,6 +19,8 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static de.gwdg.metadataqa.wikidata.json.Utils.getPath;
 
 public class PageValidationProcessor implements LineProcessor {
 
@@ -48,26 +50,23 @@ public class PageValidationProcessor implements LineProcessor {
 
   @Override
   public void read(String line, boolean processable) {
-    // System.err.println('+');
     recordCounter++;
     if (recordCounter % 100000 == 0)
       System.err.println(myFormatter.format(recordCounter));
 
     if (!processable) {
-      // System.err.print('.');
       return;
     }
 
     DocumentContext context = JsonPath.parse(line);
 
-    Object pageObject = getPath(context, "$.claims.P304");
+    Object pageObject = Utils.getPath(context, "$.claims.P304");
     if (pageObject == null) {
-      // System.err.println("no page");
       return;
     }
 
     String id = context.read("$.id");
-    JSONArray journals = (JSONArray) getPath(context, "$.claims.P1433");
+    JSONArray journals = (JSONArray) Utils.getPath(context, "$.claims.P1433");
     String journal = null;
     if (journals != null && !journals.isEmpty()) {
       journal = (String)journals.get(0);
@@ -120,17 +119,6 @@ public class PageValidationProcessor implements LineProcessor {
     c.addImproper();
     c.addType(shortened);
   }
-
-  private Object getPath(DocumentContext context, String path) {
-    Object value = null;
-    try {
-      value = context.read(path);
-    } catch (PathNotFoundException e) {
-      //
-    }
-    return value;
-  }
-
 
   @Override
   public int getRecordCounter() {

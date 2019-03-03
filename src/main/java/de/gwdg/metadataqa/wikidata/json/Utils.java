@@ -1,6 +1,10 @@
 package de.gwdg.metadataqa.wikidata.json;
 
+import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
+
+import java.util.Map;
 
 public class Utils {
   private static final int SECOND = 1000;
@@ -40,4 +44,22 @@ public class Utils {
     text.append(duration);
     return text.toString();
   }
+
+  public static Object getPath(DocumentContext context, String path) {
+    Object value = null;
+    try {
+      value = context.read(path);
+    } catch (PathNotFoundException e) {
+      //
+    }
+    return value;
+  }
+
+  public static void increment(Map<String, Integer> counter, String key) {
+    if (!counter.containsKey(key)) {
+      counter.put(key, 0);
+    }
+    counter.put(key, counter.get(key) + 1);
+  }
+
 }

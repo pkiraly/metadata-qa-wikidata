@@ -10,6 +10,7 @@ import de.gwdg.metadataqa.wikidata.json.MultithreadClassExtractor;
 import de.gwdg.metadataqa.wikidata.json.reader.LineProcessor;
 import de.gwdg.metadataqa.wikidata.json.Utils;
 import de.gwdg.metadataqa.wikidata.json.reader.PageValidationProcessor;
+import de.gwdg.metadataqa.wikidata.json.reader.TypeStatisticProcessor;
 import org.apache.commons.cli.HelpFormatter;
 
 import java.io.IOException;
@@ -61,6 +62,7 @@ public class Client {
         case TRANSFORMATION:
         case EXTRACT_LABELS_FROM_FILE:
         case PAGE_VALIDATION:
+        case TYPE_STATISTIC:
           processEntities(parameters, command);
           break;
 
@@ -98,10 +100,12 @@ public class Client {
       );
     } else if (command.equals(Command.EXTRACT_LABELS_FROM_FILE)) {
       lineProcessor = new FileBasedLabelExtractor();
-      lineProcessor.setOutputFileName(parameters.getOutputFile());
     } else if (command.equals(Command.PAGE_VALIDATION)) {
       lineProcessor = new PageValidationProcessor(parameters.getEntityFile());
-      lineProcessor.setOutputFileName(parameters.getOutputFile());
+    } else if (command.equals(Command.PAGE_VALIDATION)) {
+      lineProcessor = new PageValidationProcessor(parameters.getEntityFile());
+    } else if (command.equals(Command.TYPE_STATISTIC)) {
+      lineProcessor = new TypeStatisticProcessor(parameters.getEntityFile());
     } else {
       lineProcessor = null;
     }
