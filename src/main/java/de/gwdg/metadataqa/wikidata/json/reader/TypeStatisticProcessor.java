@@ -4,10 +4,8 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import de.gwdg.metadataqa.wikidata.json.CsvManager;
 import de.gwdg.metadataqa.wikidata.json.Utils;
-import de.gwdg.metadataqa.wikidata.model.JournalCounter;
 import de.gwdg.metadataqa.wikidata.model.WikidataType;
 import net.minidev.json.JSONArray;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

@@ -4,7 +4,6 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.opencsv.CSVWriter;
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.FileWriter;

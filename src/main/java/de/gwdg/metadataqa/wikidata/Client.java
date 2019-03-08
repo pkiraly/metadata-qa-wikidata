@@ -102,8 +102,6 @@ public class Client {
       lineProcessor = new FileBasedLabelExtractor();
     } else if (command.equals(Command.PAGE_VALIDATION)) {
       lineProcessor = new PageValidationProcessor(parameters.getEntityFile());
-    } else if (command.equals(Command.PAGE_VALIDATION)) {
-      lineProcessor = new PageValidationProcessor(parameters.getEntityFile());
     } else if (command.equals(Command.TYPE_STATISTIC)) {
       lineProcessor = new TypeStatisticProcessor(parameters.getEntityFile());
     } else {

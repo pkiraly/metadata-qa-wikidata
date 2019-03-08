@@ -3,6 +3,7 @@ package de.gwdg.metadataqa.wikidata.model;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +61,23 @@ public class JournalCounter {
         )
       ));
     return entries;
+  }
+
+  public static String csvHeader() {
+    List<String> fields = Arrays.asList(
+      "label", "id", "properPageNumberCounter", "improperPageNumberCounter", "totalTypes", "types"
+    );
+    return StringUtils.join(fields, ",");
+  }
+
+  public String toCsv() {
+    return String.format(
+      "\"%s\",%s,%d,%d,%d,\"%s\"",
+      label, id,
+      properPageNumberCounter, improperPageNumberCounter,
+      typeCounter.size(),
+      StringUtils.join(formatTypeCounters(), "; ")
+    );
   }
 
   @Override

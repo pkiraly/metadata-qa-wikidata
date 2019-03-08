@@ -145,6 +145,7 @@ public class PageValidationProcessor implements LineProcessor {
 
     Path path = Paths.get(outputFile);
     try (BufferedWriter writer = Files.newBufferedWriter(path)) {
+      writer.write(JournalCounter.csvHeader() + "\n");
       journalCounter
         .values()
         .stream()
@@ -155,7 +156,7 @@ public class PageValidationProcessor implements LineProcessor {
         .forEach(
           (counter) -> {
             try {
-              writer.write(counter.toString() + "\n");
+              writer.write(counter.toCsv() + "\n");
             } catch (IOException e) {
               e.printStackTrace();
             }
