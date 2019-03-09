@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class JournalCounter {
   String id;
@@ -54,6 +55,8 @@ public class JournalCounter {
     List<String> entries = new ArrayList<>();
     typeCounter
       .entrySet()
+      .stream()
+      .sorted((a, b) -> Integer.compare(b.getValue(), a.getValue()))
       .forEach((entry) -> entries.add(
         String.format(
           "'%s' (%d)",
@@ -76,7 +79,13 @@ public class JournalCounter {
       label, id,
       properPageNumberCounter, improperPageNumberCounter,
       typeCounter.size(),
-      StringUtils.join(formatTypeCounters(), "; ")
+      StringUtils.join(
+        formatTypeCounters()
+          .stream()
+          .limit(10)
+          .collect(Collectors.toList()),
+        "; "
+      )
     );
   }
 
