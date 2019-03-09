@@ -7,6 +7,7 @@ import de.gwdg.metadataqa.wikidata.json.InvalidPageNumberException;
 import de.gwdg.metadataqa.wikidata.json.PageValidator;
 import de.gwdg.metadataqa.wikidata.json.Utils;
 import de.gwdg.metadataqa.wikidata.model.JournalCounter;
+import de.gwdg.metadataqa.wikidata.model.PageNumberErrorType;
 import de.gwdg.metadataqa.wikidata.model.WikidataType;
 import net.minidev.json.JSONArray;
 
@@ -19,8 +20,6 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static de.gwdg.metadataqa.wikidata.json.Utils.getPath;
 
 public class PageValidationProcessor implements LineProcessor {
 
@@ -81,7 +80,7 @@ public class PageValidationProcessor implements LineProcessor {
       List<String> pages = (List<String>) pageObject;
       for (String page : pages) {
         try {
-          validator.validatePageNumbers(page);
+          validator.validatePageNumbers(page, journal);
           countProperPageNumber(journal);
         } catch (InvalidPageNumberException e) {
           if (id == null) {
@@ -89,12 +88,13 @@ public class PageValidationProcessor implements LineProcessor {
           }
           if (journal != null) {
             countImproperPageNumber(journal, e.getShortened());
-          }
-          if (report) {
-            System.err.printf(
-              "%s/%s -- invalid page number: %s (%s)%n",
-              id, journal, page, e.getType()
-            );
+            if ((report || journal.equals("Q546003"))
+              && !e.getType().equals(PageNumberErrorType.SHORTER_SECOND_NUMBER)) {
+              System.err.printf(
+                "%s/%s -- invalid page number: %s (%s)%n",
+                id, journal, page, e.getType()
+              );
+            }
           }
         }
       }
