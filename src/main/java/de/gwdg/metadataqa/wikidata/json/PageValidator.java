@@ -2,7 +2,11 @@ package de.gwdg.metadataqa.wikidata.json;
 
 import de.gwdg.metadataqa.wikidata.model.PageNumberErrorType;
 import de.gwdg.metadataqa.wikidata.model.UniqFormatEntry;
+import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -27,8 +31,50 @@ public class PageValidator {
     "Q564954", // PLoS ONE
     "Q2635829", // PLOS Computational Biology
     "Q2000010", // PeerJ
-    "Q15716652" // Medicine
+    "Q15716652", // Medicine
+    "Q1893441", // PLOS Genetics
+    "Q283209", // PLOS Pathogens
+    "Q1771695", // PLOS Biology
+    "Q2197222", // Cell Death and Disease
+    "Q27725810", // Cureus
+    "Q27727019", // Heliyon
+    "Q27724721", // JMIR research protocols
+    "Q814445", // Behavioral and Brain Sciences
+    "Q2000008", // eLife
+    "Q15757476", // Plant Signaling and Behavior
+    "Q27725386", // Plastic and reconstructive surgery. Global open
+    "Q5270111", // Diabetes Care
+    "Q18026500", // OncoImmunology
+    "Q954500", // Journal of Visualized Experiments
+    "Q19881044" // Science Advances
+
+
+
+
+
+
+
+
+
   );
+  List<Method> genericMethods;
+  List<Method> journalSpecificMethods;
+
+  public PageValidator() {
+    genericMethods = new ArrayList<>();
+    journalSpecificMethods = new ArrayList<>();
+    try {
+      genericMethods.add(this.getClass().getMethod("isPageRange", String.class));
+      genericMethods.add(this.getClass().getMethod("isSingleRoman", String.class));
+      genericMethods.add(this.getClass().getMethod("isRomanRange", String.class));
+      genericMethods.add(this.getClass().getMethod("isSingleNumber", String.class));
+
+      journalSpecificMethods.add(this.getClass().getMethod("isELocation", String.class, String.class));
+      journalSpecificMethods.add(this.getClass().getMethod("hasMetJournalStandard", String.class, String.class));
+    } catch (NoSuchMethodException e) {
+      e.printStackTrace();
+    }
+  }
 
   private static Map<String, List<Pattern>> journalBasedPatterns = new HashMap<>();
   static {
@@ -48,29 +94,14 @@ public class PageValidator {
   public boolean validatePageNumbers(String pageNumbers, String journal)
       throws InvalidPageNumberException {
     PageNumberErrorType error = null;
-    Check check = isPageRange(pageNumbers);
-    if (!check.isValid()) {
-      check = isSingleRoman(pageNumbers);
-      if (!check.isValid()) {
-        check = isRomanRange(pageNumbers);
-        if (!check.isValid()) {
-          check = isSingleNumber(pageNumbers);
-          if (!check.isValid()) {
-            if (journal != null) {
-              check = isELocation(pageNumbers, journal);
-              if (!check.isValid()) {
-                check = hasMetJournalStandard(pageNumbers, journal);
-                if (!check.isValid()) {
-                  check = new Check(false, PageNumberErrorType.NOT_NUMBERS);
-                }
-              }
-            } else {
-              check = new Check(false, PageNumberErrorType.NOT_NUMBERS);
-            }
-          }
-        }
-      }
+
+    Check check = invokeMethods(genericMethods, pageNumbers, journal);
+    if ((check == null || (!check.isValid() && check.getError() == null))
+      && StringUtils.isNotBlank(journal)) {
+      check = invokeJournalMethods(journalSpecificMethods, pageNumbers, journal);
     }
+    if (!check.isValid() && check.getError() == null)
+      check = new Check(false, PageNumberErrorType.NOT_NUMBERS);
 
     if (!check.isValid()) {
       String shortened = pageNumbers.replaceAll("\\d+", "N");
@@ -79,20 +110,35 @@ public class PageValidator {
     return true;
   }
 
-  private Check hasMetJournalStandard(String pageNumbers, String journal) {
-    Check check = new Check(false);
-    if (journalBasedPatterns.containsKey(journal)) {
-      boolean found = false;
-      for (Pattern pattern : journalBasedPatterns.get(journal)) {
-        if (pattern.matcher(pageNumbers).matches()) {
-          found = true;
+  private Check invokeMethods(List<Method> methods, String pageNumbers, String journal) {
+    Check check = null;
+    for (Method method : methods) {
+      try {
+        check = (Check) method.invoke(this, pageNumbers);
+        if (check.isValid() || check.getError() != null)
           break;
-        }
+      } catch (IllegalAccessException e) {
+        e.printStackTrace();
+      } catch (InvocationTargetException e) {
+        e.printStackTrace();
       }
-      if (found) {
-        check = new Check(true);
-      } else {
-        check = new Check(false, PageNumberErrorType.UNMET_JOURNAL_STANDARD);
+    }
+    return check;
+  }
+
+  private Check invokeJournalMethods(List<Method> methods,
+                                     String pageNumbers,
+                                     String journal) {
+    Check check = null;
+    for (Method method : methods) {
+      try {
+        check = (Check) method.invoke(this, pageNumbers, journal);
+        if (check.isValid() || check.getError() != null)
+          break;
+      } catch (IllegalAccessException e) {
+        e.printStackTrace();
+      } catch (InvocationTargetException e) {
+        e.printStackTrace();
       }
     }
     return check;
@@ -100,24 +146,24 @@ public class PageValidator {
 
   public Check isPageRange(String pageNumbers) {
     Matcher matcher = PAGE_RANGE_PATTERN.matcher(pageNumbers);
-    Check isValid;
+    Check isValid = null;
     if (matcher.matches()) {
       String page1 = matcher.group(1);
       String page2 = matcher.group(2);
       if (page2.length() < page1.length()) {
         isValid = new Check(false, PageNumberErrorType.SHORTER_SECOND_NUMBER);
-      } else {
-        try {
-          int p1 = Integer.parseInt(page1);
-          int p2 = Integer.parseInt(page2);
-          if (p2 < p1) {
-            isValid = new Check(false, PageNumberErrorType.SMALLER_SECOND_NUMBER);
-          } else {
-            isValid = new Check(true);
-          }
-        } catch (NumberFormatException e) {
-          isValid = new Check(false, PageNumberErrorType.NUMBER_FORMAT);
+        page2 = page1.substring(0, page1.length() - page2.length()) + page2;
+      }
+      try {
+        int p1 = Integer.parseInt(page1);
+        int p2 = Integer.parseInt(page2);
+        if (p2 < p1) {
+          isValid = new Check(false, PageNumberErrorType.SMALLER_SECOND_NUMBER);
+        } else if (isValid == null) {
+          isValid = new Check(true);
         }
+      } catch (NumberFormatException e) {
+        isValid = new Check(false, PageNumberErrorType.NUMBER_FORMAT);
       }
     } else {
       isValid = new Check(false);
@@ -147,6 +193,25 @@ public class PageValidator {
       }
     } else {
       check = new Check(false);
+    }
+    return check;
+  }
+
+  public Check hasMetJournalStandard(String pageNumbers, String journal) {
+    Check check = new Check(false);
+    if (journalBasedPatterns.containsKey(journal)) {
+      boolean found = false;
+      for (Pattern pattern : journalBasedPatterns.get(journal)) {
+        if (pattern.matcher(pageNumbers).matches()) {
+          found = true;
+          break;
+        }
+      }
+      if (found) {
+        check = new Check(true);
+      } else {
+        check = new Check(false, PageNumberErrorType.UNMET_JOURNAL_STANDARD);
+      }
     }
     return check;
   }

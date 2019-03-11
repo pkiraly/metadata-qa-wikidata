@@ -7,7 +7,6 @@ import de.gwdg.metadataqa.wikidata.json.InvalidPageNumberException;
 import de.gwdg.metadataqa.wikidata.json.PageValidator;
 import de.gwdg.metadataqa.wikidata.json.Utils;
 import de.gwdg.metadataqa.wikidata.model.JournalCounter;
-import de.gwdg.metadataqa.wikidata.model.PageNumberErrorType;
 import de.gwdg.metadataqa.wikidata.model.WikidataType;
 import net.minidev.json.JSONArray;
 
@@ -17,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +32,7 @@ public class PageValidationProcessor implements LineProcessor {
   private Map<String, String> entities;
   private int recordCounter = 0;
   private DecimalFormat myFormatter = new DecimalFormat("###,###.###");
+  private List<String> journalsToDebug = Arrays.asList(); // "Q546003"
 
   public PageValidationProcessor(String entitiesFile) {
     this.entitiesFile = entitiesFile;
@@ -80,16 +81,14 @@ public class PageValidationProcessor implements LineProcessor {
       List<String> pages = (List<String>) pageObject;
       for (String page : pages) {
         try {
-          // ix-xxxviii
           validator.validatePageNumbers(page, journal);
           countProperPageNumber(journal);
         } catch (InvalidPageNumberException e) {
-          if (journal != null && journal.equals("Q564954")) {
-            System.err.println(page);
-            System.err.println(e);
-          }
           if (id == null) {
             id = context.read("$.id");
+          }
+          if (journal != null && journalsToDebug.contains(journal)) {
+            System.err.printf("%s) %s (%s): %s%n", id, journal, e.getType(), page);
           }
           if (journal != null) {
             countImproperPageNumber(journal, e);

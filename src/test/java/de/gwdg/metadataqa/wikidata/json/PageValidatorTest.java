@@ -14,6 +14,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class PageValidatorTest {
@@ -126,5 +129,29 @@ public class PageValidatorTest {
     assertTrue(valid);
   }
 
+  @Test
+  public void testJournalBasedPattern() {
+    boolean valid = false;
+    InvalidPageNumberException exception = null;
+    try {
+      valid = validator.validatePageNumbers("e3533", "Q546003");
+    } catch (InvalidPageNumberException ex) {
+      exception = ex;
+    }
+    assertNull(exception);
+    assertTrue(valid);
+  }
 
+  @Test
+  public void testSmallerSecond() {
+    boolean valid = false;
+    InvalidPageNumberException e = null;
+    try {
+      valid = validator.validatePageNumbers("11954-73", "Q564954");
+    } catch (InvalidPageNumberException ex) {
+      e = ex;
+    }
+    assertEquals(PageNumberErrorType.SHORTER_SECOND_NUMBER, e.getType());
+    assertFalse(valid);
+  }
 }
