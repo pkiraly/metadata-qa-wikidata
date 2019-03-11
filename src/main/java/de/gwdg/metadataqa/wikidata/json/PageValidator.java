@@ -47,15 +47,6 @@ public class PageValidator {
     "Q18026500", // OncoImmunology
     "Q954500", // Journal of Visualized Experiments
     "Q19881044" // Science Advances
-
-
-
-
-
-
-
-
-
   );
   List<Method> genericMethods;
   List<Method> journalSpecificMethods;
@@ -82,6 +73,22 @@ public class PageValidator {
     journalBasedPatterns.put("Q546003", Arrays.asList(
       Pattern.compile("^([abcdefghijk]\\d+)(-\\1)?$"),
       Pattern.compile("^\\d+(-\\d+)?; (author reply|discussion) \\d+(-\\d+)?$")
+    ));
+    // Acta Crystallographica Section E: Structure Reports Online -- there are real page numbers
+    journalBasedPatterns.put("Q15708689", Arrays.asList(
+      Pattern.compile("^([omie])(\\d+)(-\\1?\\d+)?$")
+    ));
+    // Critical Care -- article ID
+    journalBasedPatterns.put("Q5186602", Arrays.asList(
+      Pattern.compile("^([ERS])(\\d+)((?:–|-)\\d+)?$")
+    ));
+    // American Journal of Physiology
+    journalBasedPatterns.put("Q2160146", Arrays.asList(
+      Pattern.compile("^([CEFGHLRS])(\\d+)((?:–|-)\\d+)?$")
+    ));
+    // Proceedings of the National Academy of Sciences of the United States of America
+    journalBasedPatterns.put("Q1146531", Arrays.asList(
+      Pattern.compile("^([E])(\\d+)((?:–|-)\\1?\\d+)?$")
     ));
   }
 

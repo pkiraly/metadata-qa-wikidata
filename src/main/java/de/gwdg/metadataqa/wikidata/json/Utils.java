@@ -3,6 +3,7 @@ package de.gwdg.metadataqa.wikidata.json;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
+import net.minidev.json.JSONArray;
 
 import java.util.Map;
 
@@ -53,6 +54,15 @@ public class Utils {
       //
     }
     return value;
+  }
+
+  public static String getPathAsString(DocumentContext context, String path) {
+    JSONArray items = (JSONArray) Utils.getPath(context, path);
+    String item = null;
+    if (items != null && !items.isEmpty()) {
+      item = (String)items.get(0);
+    }
+    return item;
   }
 
   public static void increment(Map<String, Integer> counter, String key) {

@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static de.gwdg.metadataqa.wikidata.model.PageNumberErrorType.SHORTER_SECOND_NUMBER;
+
 public class PageValidationProcessor implements LineProcessor {
 
   private final String entitiesFile;
@@ -32,7 +34,9 @@ public class PageValidationProcessor implements LineProcessor {
   private Map<String, String> entities;
   private int recordCounter = 0;
   private DecimalFormat myFormatter = new DecimalFormat("###,###.###");
-  private List<String> journalsToDebug = Arrays.asList(); // "Q546003"
+  private List<String> journalsToDebug = Arrays.asList(
+    "Q2160146", "Q1146531", "Q867727", "Q546003", "Q5186602"
+  );
 
   public PageValidationProcessor(String entitiesFile) {
     this.entitiesFile = entitiesFile;
@@ -69,14 +73,9 @@ public class PageValidationProcessor implements LineProcessor {
     JSONArray journals = (JSONArray) Utils.getPath(context, "$.claims.P1433");
     String journal = null;
     if (journals != null && !journals.isEmpty()) {
-      journal = (String)journals.get(0);
-      /*
-      if (journal.equals("Q7104844")) {
-        System.err.println(id);
-      }
-      */
+      journal = (String) journals.get(0);
     }
-    ;
+
     if (pageObject instanceof JSONArray) {
       List<String> pages = (List<String>) pageObject;
       for (String page : pages) {
@@ -87,8 +86,13 @@ public class PageValidationProcessor implements LineProcessor {
           if (id == null) {
             id = context.read("$.id");
           }
-          if (journal != null && journalsToDebug.contains(journal)) {
-            System.err.printf("%s) %s (%s): %s%n", id, journal, e.getType(), page);
+          if (journal != null
+              && journalsToDebug.contains(journal)
+              && !e.getType().equals(SHORTER_SECOND_NUMBER)) {
+            String doi = Utils.getPathAsString(context, "$.claims.P356");
+            System.err.printf(
+              "%s) %s (%s): %s (doi: http://doi.org/%s)%n",
+              id, journal, e.getType(), page, doi);
           }
           if (journal != null) {
             countImproperPageNumber(journal, e);

@@ -1,6 +1,5 @@
 package de.gwdg.metadataqa.wikidata.json;
 
-import com.sun.media.sound.InvalidDataException;
 import de.gwdg.metadataqa.wikidata.model.PageNumberErrorType;
 import org.junit.Before;
 import org.junit.Test;
