@@ -14,7 +14,8 @@ public class JournalCounter {
   String label;
   int properPageNumberCounter = 0;
   int improperPageNumberCounter = 0;
-  Map<String, Integer> typeCounter = new HashMap<>();
+  Map<String, Integer> pageNumberPatternCounter = new HashMap<>();
+  Map<PageNumberErrorType, Integer> errorTypeCounter = new HashMap<>();
 
   public JournalCounter(String id) {
     this.id = id;
@@ -28,11 +29,18 @@ public class JournalCounter {
     improperPageNumberCounter++;
   }
 
-  public void addType(String type) {
-    if (!typeCounter.containsKey(type)) {
-      typeCounter.put(type, 0);
+  public void addPageNumberPattern(String value) {
+    if (!pageNumberPatternCounter.containsKey(value)) {
+      pageNumberPatternCounter.put(value, 0);
     }
-    typeCounter.put(type, typeCounter.get(type) + 1);
+    pageNumberPatternCounter.put(value, pageNumberPatternCounter.get(value) + 1);
+  }
+
+  public void addPageErrorType(PageNumberErrorType value) {
+    if (!errorTypeCounter.containsKey(value)) {
+      errorTypeCounter.put(value, 0);
+    }
+    errorTypeCounter.put(value, errorTypeCounter.get(value) + 1);
   }
 
   public void setLabel(String label) {
@@ -47,13 +55,13 @@ public class JournalCounter {
     return improperPageNumberCounter;
   }
 
-  public Map<String, Integer> getTypeCounter() {
-    return typeCounter;
+  public Map<String, Integer> getPageNumberPatternCounter() {
+    return pageNumberPatternCounter;
   }
 
   public List<String> formatTypeCounters() {
     List<String> entries = new ArrayList<>();
-    typeCounter
+    pageNumberPatternCounter
       .entrySet()
       .stream()
       .sorted((a, b) -> Integer.compare(b.getValue(), a.getValue()))
@@ -67,18 +75,32 @@ public class JournalCounter {
   }
 
   public static String csvHeader() {
-    List<String> fields = Arrays.asList(
-      "label", "id", "properPageNumberCounter", "improperPageNumberCounter", "totalTypes", "types"
-    );
+    List<String> fields = new ArrayList<String>(Arrays.asList(
+      "label", "id", "properPageNumberCounter", "improperPageNumberCounter"
+    ));
+    for (PageNumberErrorType type : PageNumberErrorType.values()) {
+      fields.add(type.name());
+    }
+    fields.add("totalTypes");
+    fields.add("types");
     return StringUtils.join(fields, ",");
+  }
+
+  private Object getErrorTypes() {
+    List<Integer> list = new ArrayList<>();
+    for (PageNumberErrorType type : PageNumberErrorType.values()) {
+      list.add(errorTypeCounter.getOrDefault(type, 0));
+    }
+    return StringUtils.join(list, ",");
   }
 
   public String toCsv() {
     return String.format(
-      "\"%s\",%s,%d,%d,%d,\"%s\"",
+      "\"%s\",%s,%d,%d,%s,%d,\"%s\"",
       label, id,
       properPageNumberCounter, improperPageNumberCounter,
-      typeCounter.size(),
+      getErrorTypes(),
+      pageNumberPatternCounter.size(),
       StringUtils.join(
         formatTypeCounters()
           .stream()
@@ -94,7 +116,7 @@ public class JournalCounter {
     return label + " (" + id + ")" +
       ": proper=" + properPageNumberCounter +
       ", improper=" + improperPageNumberCounter +
-      ", total types=" + typeCounter.size() +
+      ", total types=" + pageNumberPatternCounter.size() +
       ", types=" + StringUtils.join(formatTypeCounters(), ", ")
     ;
   }

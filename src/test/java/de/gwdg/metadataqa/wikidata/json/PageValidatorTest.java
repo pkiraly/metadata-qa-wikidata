@@ -10,7 +10,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
+import static org.junit.Assert.assertTrue;
 
 public class PageValidatorTest {
 
@@ -78,5 +82,49 @@ public class PageValidatorTest {
       System.out.printf("%s: %d%n", entry.getKey(), entry.getValue());
     }
   }
+
+  @Test
+  public void testRomanPattern() {
+    Pattern singleRoman = Pattern.compile("^(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$", CASE_INSENSITIVE);
+    assertTrue(singleRoman.matcher("ix").matches());
+    assertTrue(singleRoman.matcher("xxxviii").matches());
+
+    Pattern doubleRoman = Pattern.compile("^(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})(?:–|-)(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$", CASE_INSENSITIVE);
+    assertTrue(doubleRoman.matcher("ix-xxxviii").matches());
+  }
+
+  @Test
+  public void testSingleRoman() {
+    boolean valid = false;
+    try {
+      valid = validator.validatePageNumbers("ix", "test");
+    } catch (InvalidPageNumberException e) {
+      System.err.println(e);
+    }
+    assertTrue(valid);
+  }
+
+  @Test
+  public void testRomanRange() {
+    boolean valid = false;
+    try {
+      valid = validator.validatePageNumbers("ix-xxxviii", "test");
+    } catch (InvalidPageNumberException e) {
+      System.err.println(e);
+    }
+    assertTrue(valid);
+  }
+
+  @Test
+  public void testELocation() {
+    boolean valid = false;
+    try {
+      valid = validator.validatePageNumbers("e53453", "Q564954");
+    } catch (InvalidPageNumberException e) {
+      System.err.println(e);
+    }
+    assertTrue(valid);
+  }
+
 
 }

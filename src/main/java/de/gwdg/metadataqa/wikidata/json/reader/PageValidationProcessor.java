@@ -80,16 +80,21 @@ public class PageValidationProcessor implements LineProcessor {
       List<String> pages = (List<String>) pageObject;
       for (String page : pages) {
         try {
+          // ix-xxxviii
           validator.validatePageNumbers(page, journal);
           countProperPageNumber(journal);
         } catch (InvalidPageNumberException e) {
+          if (journal != null && journal.equals("Q564954")) {
+            System.err.println(page);
+            System.err.println(e);
+          }
           if (id == null) {
             id = context.read("$.id");
           }
           if (journal != null) {
-            countImproperPageNumber(journal, e.getShortened());
-            if ((report || journal.equals("Q546003"))
-              && !e.getType().equals(PageNumberErrorType.SHORTER_SECOND_NUMBER)) {
+            countImproperPageNumber(journal, e);
+            if ((report)) { // || journal.equals("Q546003"))
+              // && !e.getType().equals(PageNumberErrorType.SHORTER_SECOND_NUMBER)) {
               System.err.printf(
                 "%s/%s -- invalid page number: %s (%s)%n",
                 id, journal, page, e.getType()
@@ -111,13 +116,14 @@ public class PageValidationProcessor implements LineProcessor {
     c.addProper();
   }
 
-  private void countImproperPageNumber(String journal, String shortened) {
+  private void countImproperPageNumber(String journal, InvalidPageNumberException execption) {
     if (!journalCounter.containsKey(journal)) {
       journalCounter.put(journal, new JournalCounter(journal));
     }
-    JournalCounter c = journalCounter.get(journal);
-    c.addImproper();
-    c.addType(shortened);
+    JournalCounter journalCounter = this.journalCounter.get(journal);
+    journalCounter.addImproper();
+    journalCounter.addPageNumberPattern(execption.getShortened());
+    journalCounter.addPageErrorType(execption.getType());
   }
 
   @Override
