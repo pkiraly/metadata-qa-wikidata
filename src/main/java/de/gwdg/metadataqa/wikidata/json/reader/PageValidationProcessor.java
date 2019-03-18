@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static de.gwdg.metadataqa.wikidata.model.PageNumberErrorType.SHORTER_SECOND_NUMBER;
+import static de.gwdg.metadataqa.wikidata.model.PageNumberErrorType.SMALLER_SECOND_NUMBER;
 
 public class PageValidationProcessor implements LineProcessor {
 
@@ -35,7 +36,8 @@ public class PageValidationProcessor implements LineProcessor {
   private int recordCounter = 0;
   private DecimalFormat myFormatter = new DecimalFormat("###,###.###");
   private List<String> journalsToDebug = Arrays.asList(
-    "Q2160146", "Q1146531", "Q867727", "Q546003", "Q5186602"
+    "Q3193662", "Q135122"
+    // "Q2160146", "Q1146531", "Q867727", "Q546003", "Q5186602"
   );
 
   public PageValidationProcessor(String entitiesFile) {
@@ -119,14 +121,15 @@ public class PageValidationProcessor implements LineProcessor {
     c.addProper();
   }
 
-  private void countImproperPageNumber(String journal, InvalidPageNumberException execption) {
+  private void countImproperPageNumber(String journal, InvalidPageNumberException exception) {
     if (!journalCounter.containsKey(journal)) {
       journalCounter.put(journal, new JournalCounter(journal));
     }
     JournalCounter journalCounter = this.journalCounter.get(journal);
     journalCounter.addImproper();
-    journalCounter.addPageNumberPattern(execption.getShortened());
-    journalCounter.addPageErrorType(execption.getType());
+    journalCounter.addPageErrorType(exception.getType());
+    if (!exception.getType().equals(SHORTER_SECOND_NUMBER) && !exception.getType().equals(SMALLER_SECOND_NUMBER))
+      journalCounter.addPageNumberPattern(exception.getShortened());
   }
 
   @Override

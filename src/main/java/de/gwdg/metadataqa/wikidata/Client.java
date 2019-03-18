@@ -3,6 +3,7 @@ package de.gwdg.metadataqa.wikidata;
 import de.gwdg.metadataqa.wikidata.json.BreakException;
 import de.gwdg.metadataqa.wikidata.json.ClassExtractor;
 import de.gwdg.metadataqa.wikidata.json.CliParameters;
+import de.gwdg.metadataqa.wikidata.json.reader.AuthorValidationProcessor;
 import de.gwdg.metadataqa.wikidata.json.reader.EntityResolver;
 import de.gwdg.metadataqa.wikidata.json.reader.FileBasedLabelExtractor;
 import de.gwdg.metadataqa.wikidata.json.reader.JsonTransformer;
@@ -62,6 +63,7 @@ public class Client {
         case TRANSFORMATION:
         case EXTRACT_LABELS_FROM_FILE:
         case PAGE_VALIDATION:
+        case AUTHOR_VALIDATION:
         case TYPE_STATISTIC:
           processEntities(parameters, command);
           break;
@@ -102,6 +104,8 @@ public class Client {
       lineProcessor = new FileBasedLabelExtractor();
     } else if (command.equals(Command.PAGE_VALIDATION)) {
       lineProcessor = new PageValidationProcessor(parameters.getEntityFile());
+    } else if (command.equals(Command.AUTHOR_VALIDATION)) {
+      lineProcessor = new AuthorValidationProcessor(parameters.getEntityFile());
     } else if (command.equals(Command.TYPE_STATISTIC)) {
       lineProcessor = new TypeStatisticProcessor(parameters.getEntityFile());
     } else {

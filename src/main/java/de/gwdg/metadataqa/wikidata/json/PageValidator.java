@@ -80,7 +80,7 @@ public class PageValidator {
     ));
     // Critical Care -- article ID
     journalBasedPatterns.put("Q5186602", Arrays.asList(
-      Pattern.compile("^([ERS])(\\d+)((?:–|-)\\d+)?$")
+      Pattern.compile("^([EPRS])(\\d+)((?:–|-)\\1?\\d+)?$")
     ));
     // American Journal of Physiology
     journalBasedPatterns.put("Q2160146", Arrays.asList(

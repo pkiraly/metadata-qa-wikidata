@@ -5,6 +5,7 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import net.minidev.json.JSONArray;
 
+import java.util.List;
 import java.util.Map;
 
 public class Utils {
@@ -64,6 +65,17 @@ public class Utils {
     }
     return item;
   }
+
+  public static List<String> getPathAsList(DocumentContext context, String path) {
+    List<String> items = null;
+    try {
+      items = context.read(path);
+    } catch (PathNotFoundException e) {
+      //
+    }
+    return items;
+  }
+
 
   public static void increment(Map<String, Integer> counter, String key) {
     if (!counter.containsKey(key)) {
